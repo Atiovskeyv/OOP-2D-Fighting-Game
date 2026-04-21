@@ -6,6 +6,8 @@ Build/
 Builds/
 Logs/
 UserSettings/
+Assets/Readme.asset
+Assets/Readme.asset.meta
 
 # IDE
 .vscode/
