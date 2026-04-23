@@ -44,3 +44,4 @@ mono_crash.*
 
 # Test / cache
 *.log
+.vscode
