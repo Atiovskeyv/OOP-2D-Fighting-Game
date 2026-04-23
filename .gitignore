@@ -12,6 +12,8 @@ Assets/Readme.asset.meta
 # IDE
 .vscode/
 .idea/
+.vs/
+.vsconfig
 
 # Visual Studio / Rider
 *.csproj
