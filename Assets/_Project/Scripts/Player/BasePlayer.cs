@@ -31,8 +31,8 @@ namespace FightingGame.Core.Player
         Dead    = 1 << 8
     }
 
-    // ── Animator Parametre Sabitleri ─────────────────────────────────────────
-    // string yerine hash kullanmak, Animator.SetBool/SetFloat çağrılarını
+    // ── Animator Parametre Sabitleri ───────────────────────────────────────────────
+    // string yerine hash kullanmak, Animator.SetBool/SetFloat çağrıları
     // ~%30 daha hızlı yapar. Her frame çağrıldığı için fark önemlidir.
     internal static class AnimParam
     {
@@ -50,7 +50,7 @@ namespace FightingGame.Core.Player
     [RequireComponent(typeof(Animator))]            // [1] Animator zorunlu bileşen
     public abstract class BasePlayer : MonoBehaviour, IDamageable
     {
-        // ── Inspector Alanları ───────────────────────────────────────────────
+        // ── Inspector Alanları ───────────────────────────────────────────────────────
 
         [Header("Data")]
         [SerializeField] protected CharacterData data;
@@ -65,7 +65,8 @@ namespace FightingGame.Core.Player
         [SerializeField] private float     groundCheckRadius = 0.2f;
         [SerializeField] private LayerMask groundLayer;
 
-        // ── [2] Crouch Ayarları ──────────────────────────────────────────────
+        // ── [2] Crouch Ayarları ─────────────────────────────────────────────────────
+
         [Header("Crouch")]
         [Tooltip("Ayakta CharacterController yüksekliği.")]
         [SerializeField] private float standingHeight = 2f;
@@ -76,31 +77,37 @@ namespace FightingGame.Core.Player
         [Tooltip("Crouch geçişinin yumuşaklığı (Lerp hızı).")]
         [SerializeField] private float crouchLerpSpeed = 12f;
 
-        // ── [3] Attack Sync ──────────────────────────────────────────────────
+        // ── [3] Attack Sync ─────────────────────────────────────────────────────────
+
         // true iken Animation Event'ten OnAttackHitFrame() çağrısı beklenir.
         // false iken eski davranış: saldırı başladığında anında hasar verir.
         [Header("Attack Sync")]
-        [Tooltip("true → hitbox yalnızca Animation Event ile tetiklenir.\n" +
+        [Tooltip("true → hitbox yalnızca Animation Event ile tetiklenir.\n"+
                  "false → saldırı başlar başlamaz hasar uygulanır (geliştirme modu).")]
         [SerializeField] private bool useAnimationEventSync = true;
 
-        // ── IDamageable ──────────────────────────────────────────────────────
+        // ── Visual Settings ─────────────────────────────────────────────────────────
+        
+        [Header("Visual Settings")]
+        [SerializeField] protected Transform visualMesh; // New addition for visual synchronization
+
+        // ── IDamageable ─────────────────────────────────────────────────────────────
 
         private int _currentHealth;
         public int  CurrentHealth => _currentHealth;
         public int  MaxHealth     => data != null ? data.maxHealth : 0;
         public bool IsAlive       => _currentHealth > 0;
 
-        // ── State ────────────────────────────────────────────────────────────
+        // ── State ───────────────────────────────────────────────────────────────────
 
         public PlayerState CurrentState { get; private set; } = PlayerState.Idle;
 
-        // ── Bileşen Referansları ─────────────────────────────────────────────
+        // ── Bileşen Referansları ───────────────────────────────────────────────────
 
         private CharacterController _cc;
         protected Animator          _animator;          // alt sınıflar erişebilir
 
-        // ── Fizik ────────────────────────────────────────────────────────────
+        // ── Fizik ───────────────────────────────────────────────────────────────────
 
         private Vector3 _velocity;
         private bool    _isGrounded;
@@ -109,7 +116,7 @@ namespace FightingGame.Core.Player
         private float _targetHeight;
         private const float Gravity = -20f;
 
-        // ── Unity Lifecycle ──────────────────────────────────────────────────
+        // ── Unity Lifecycle ────────────────────────────────────────────────────────
 
         protected virtual void Awake()
         {
@@ -124,7 +131,6 @@ namespace FightingGame.Core.Player
 
             _currentHealth         = data.maxHealth;
             _cc.height             = standingHeight;        // [2] başlangıç yüksekliği
-
             _cc.center = new Vector3(0, standingHeight / 2f, 0);
             _targetHeight = standingHeight;
         }
@@ -146,7 +152,21 @@ namespace FightingGame.Core.Player
             UpdateAnimatorLocomotion();                     // [1] Speed her frame güncellenir
         }
 
-        // ── IDamageable ──────────────────────────────────────────────────────
+        protected virtual void LateUpdate()
+        {
+            // Adjust visual mesh position to lock visuals to the ground
+            if (visualMesh != null)
+            {
+                // visualMesh.localPosition = new Vector3(
+                //     visualMesh.localPosition.x,
+                //     _cc.center.y - (_cc.height / 2f),
+                //     visualMesh.localPosition.z
+                // );
+                visualMesh.localPosition = new Vector3(0, _cc.height / 2f, 0);
+            }
+        }
+
+        // ── IDamageable ─────────────────────────────────────────────────────────────
 
         public void TakeDamage(int amount)
         {
@@ -160,7 +180,7 @@ namespace FightingGame.Core.Player
             else                     TransitionTo(PlayerState.Hit);
         }
 
-        // ── Durum Makinesi ───────────────────────────────────────────────────
+        // ── Durum Makinesi ─────────────────────────────────────────────────────────────
 
         protected void TransitionTo(PlayerState newState)
         {
@@ -177,7 +197,7 @@ namespace FightingGame.Core.Player
 
         protected virtual void OnStateChanged(PlayerState previous, PlayerState next) { }
 
-        // ── [1] Animator Senkronizasyonu ─────────────────────────────────────
+        // ── [1] Animator Senkronizasyonu ───────────────────────────────────────────────
         //
         // Tüm bool parametreleri her geçişte sıfırlanıp yalnızca aktif durum
         // true yapılır. Bu "resetle, sonra set et" yaklaşımı, yanlış kalan
@@ -219,7 +239,7 @@ namespace FightingGame.Core.Player
             _animator.SetFloat(AnimParam.Speed, Mathf.Abs(_velocity.x));
         }
 
-        // ── Hareket Sistemleri ───────────────────────────────────────────────
+        // ── Hareket Sistemleri ──────────────────────────────────────────────────────────
 
         private void TickCooldowns()
         {
@@ -233,29 +253,23 @@ namespace FightingGame.Core.Player
             }
         }
 
-        // private void CheckGround()
-        // {
-        //     _isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer);
-        //     if (_isGrounded && _velocity.y < 0f) _velocity.y = -2f;
-        // }
         private void CheckGround()
-{
-    // Kapsül tabanı = pozisyon + center - (height/2) — her frame doğru hesaplanır
-    Vector3 capsuleBase = transform.position
-                        + _cc.center
-                        - new Vector3(0f, _cc.height * 0.5f, 0f);
+        {
+            Vector3 capsuleBase = transform.position
+                                + _cc.center
+                                - new Vector3(0f, _cc.height * 0.5f, 0f);
 
-    _isGrounded = Physics.CheckSphere(capsuleBase, groundCheckRadius, groundLayer);
+            _isGrounded = Physics.CheckSphere(capsuleBase, groundCheckRadius, groundLayer);
 
-    if (_isGrounded && _velocity.y < 0f)
-        _velocity.y = -2f;
-}
+            if (_isGrounded && _velocity.y < 0f)
+                _velocity.y = -2f;
+        }
 
-         private void HandleGravity()
-         {
-             if (HasState(PlayerState.Dash)) return;
-             _velocity.y += Gravity * Time.deltaTime;
-         }
+        private void HandleGravity()
+        {
+            if (HasState(PlayerState.Dash)) return;
+            _velocity.y += Gravity * Time.deltaTime;
+        }
 
         private void HandleMovement()
         {
@@ -271,7 +285,7 @@ namespace FightingGame.Core.Player
                 TransitionTo(Mathf.Abs(horizontal) > 0.01f ? PlayerState.Move : PlayerState.Idle);
         }
 
-        // ── [2] Physical Crouch ──────────────────────────────────────────────
+        // ── [2] Physical Crouch ─────────────────────────────────────────────────────────
         //
         // CharacterController.height doğrudan değiştirilirse karakter aniden
         // yükselip alçalır. Lerp ile yumuşak geçiş sağlanır.
@@ -287,11 +301,9 @@ namespace FightingGame.Core.Player
             else if (HasState(PlayerState.Crouch))
                 TransitionTo(PlayerState.Idle);
 
-            // Hedef yükseklik: çömeliyse crouchHeight, değilse standingHeight
             float targetHeight = HasState(PlayerState.Crouch) ? crouchHeight : standingHeight;
             float newHeight    = Mathf.Lerp(_cc.height, targetHeight, crouchLerpSpeed * Time.deltaTime);
 
-            // Center.y'yi yüksekliğin yarısında tut → collider zemire yaslanır
             _cc.height   = newHeight;
             _cc.center   = new Vector3(0f, newHeight * 0.5f, 0f);
         }
@@ -327,12 +339,12 @@ namespace FightingGame.Core.Player
             TransitionTo(PlayerState.Dash);
         }
 
-        // ── [3] Attack Sync ──────────────────────────────────────────────────
+        // ── [3] Attack Sync ─────────────────────────────────────────────────────────
         //
         // useAnimationEventSync == true  → Trigger animator'ı ateşler,
         //   animasyon vuruş karesine geldiğinde Animation Event üzerinden
         //   OnAttackHitFrame() çağrılır; hasar o anda uygulanır.
-        //
+
         // useAnimationEventSync == false → eski davranış; anlık hasar.
         //   Animator henüz kurulmamışken geliştirme aşamasında kullanışlıdır.
 
@@ -347,26 +359,23 @@ namespace FightingGame.Core.Player
 
             if (!useAnimationEventSync)
             {
-                // Geliştirme modu: animasyon event'i beklenmeden hasar anında verilir
                 PerformHitboxCheck();
                 Invoke(nameof(ResetAfterAttack), 0.3f);
             }
-            // useAnimationEventSync == true ise ResetAfterAttack,
-            // OnAttackHitFrame içinde animasyon bittikten sonra çağrılır.
         }
 
         /// <summary>
         /// Animation Event ile çağrılır.
         /// Animator Controller'daki saldırı animasyonunun vuruş karesine
         /// bu metodu bir "Animation Event" olarak ekle:
-        ///   Function : OnAttackHitFrame
-        ///   (parametre yok)
+        /// Function : OnAttackHitFrame
+        /// (parametre yok)
         /// </summary>
         public void OnAttackHitFrame()
         {
-            if (!HasState(PlayerState.Attack)) return;  // geç kalmış event koruması
+            if (!HasState(PlayerState.Attack)) return;
             PerformHitboxCheck();
-            Invoke(nameof(ResetAfterAttack), 0.05f);    // vuruş sonrası kısa bekleme
+            Invoke(nameof(ResetAfterAttack), 0.05f);
         }
 
         private void ResetAfterAttack()
@@ -385,7 +394,7 @@ namespace FightingGame.Core.Player
 
         private void ApplyMovement() => _cc.Move(_velocity * Time.deltaTime);
 
-        // ── Hitbox ───────────────────────────────────────────────────────────
+        // ── Hitbox ──────────────────────────────────────────────────────────────────────
 
         private void PerformHitboxCheck()
         {
@@ -393,13 +402,13 @@ namespace FightingGame.Core.Player
 
             Collider[] hits = Physics.OverlapSphere(
                 attackPoint.position, data.attackRange, enemyLayer);
-
+            
             foreach (Collider hit in hits)
                 if (hit.TryGetComponent<IDamageable>(out var target) && target.IsAlive)
                     target.TakeDamage(data.attackPower);
         }
 
-        // ── Ölüm ─────────────────────────────────────────────────────────────
+        // ── Ölüm ────────────────────────────────────────────────────────────────────────
 
         private void Die()
         {
@@ -411,7 +420,7 @@ namespace FightingGame.Core.Player
         protected virtual void OnDeath() =>
             Debug.Log($"[{data.characterName}] öldü.");
 
-        // ── Soyut Input Metotları ────────────────────────────────────────────
+        // ── Soyut Input Metotları ──────────────────────────────────────────────────────
 
         protected abstract float GetHorizontalInput();
         protected abstract bool  GetJumpInput();
@@ -420,7 +429,7 @@ namespace FightingGame.Core.Player
         protected abstract bool  GetDashInput();
         protected abstract bool  GetCrouchInput();
 
-        // ── Editor Gizmos ────────────────────────────────────────────────────
+        // ── Editor Gizmos ──────────────────────────────────────────────────────────────
 
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
