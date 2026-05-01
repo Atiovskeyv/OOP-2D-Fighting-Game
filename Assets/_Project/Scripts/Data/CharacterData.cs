@@ -72,6 +72,15 @@ namespace FightingGame.Core.Data
         [Min(0f)]
         public float attackRange = 1.5f;
 
+        // ── Dash ────────────────────────────────────────────────
+
+        [Header("Dash")]
+        [Tooltip("İki ardışık dash arasındaki minimum bekleme süresi (saniye).\n" +
+                 "Sayaç dash başlangıcında işler; dash hareketinin kendisi (~0.2s)\n" +
+                 "bu sürenin içindedir, yani 0.8 cooldown ≈ 0.6s gerçek bekleme.")]
+        [Min(0f)]
+        public float dashCooldown = 0.8f;
+
         // ── Savunma ─────────────────────────────────────────────
 
         [Header("Defense")]

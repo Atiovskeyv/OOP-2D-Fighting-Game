@@ -59,6 +59,12 @@ namespace FightingGame.Core.Player
         [SerializeField] private Transform attackPoint;
         [SerializeField] private LayerMask enemyLayer;
 
+        [Header("Opponent")]
+        [Tooltip("Karakterin yüzünü döndüğü rakip transform'u.\n" +
+                 "Normal akış: MatchManager runtime'da SetOpponent(...) ile atar.\n" +
+                 "Bu alan ad-hoc test için manuel override olarak kullanılabilir; üretim sahnelerinde boş bırakılması beklenir.")]
+        [SerializeField] private Transform opponent;
+
         [Header("Ground Check")]
         [SerializeField] private Transform groundCheck;
         [SerializeField] private float     groundCheckRadius = 0.2f;
@@ -110,10 +116,14 @@ namespace FightingGame.Core.Player
 
         private Vector3 _velocity;
         private bool    _isGrounded;
-        private float   _dashTimer;
+        private float   _dashTimer;             // dash hareketinin kendi süresi (~0.2s)
+        private float   _dashCooldownTimer;     // bir sonraki dash atılana kadar bekleme
         private float   _attackCooldownTimer;
         private float _targetHeight;
         private const float Gravity = -20f;
+
+        
+        private float _defaultYRotation;
 
         // ── Unity Lifecycle ────────────────────────────────────────────────────────
 
@@ -132,6 +142,8 @@ namespace FightingGame.Core.Player
             _cc.height             = standingHeight;        // [2] başlangıç yüksekliği
             _cc.center = new Vector3(0, standingHeight / 2f, 0);
             _targetHeight = standingHeight;
+
+            _defaultYRotation = transform.eulerAngles.y;
         }
 
         protected virtual void Update()
@@ -148,6 +160,7 @@ namespace FightingGame.Core.Player
             HandleAttack();
             HandleBlock();
             ApplyMovement();
+            UpdateFacing();                                 // [4] Rakibe doğru bakma
             UpdateAnimatorLocomotion();                     // [1] Speed her frame güncellenir
         }
 
@@ -212,10 +225,7 @@ namespace FightingGame.Core.Player
             else if (HasState(PlayerState.Hit))    _animator.SetBool(AnimParam.IsHit,       true);
             else if (HasState(PlayerState.Dead))   _animator.SetBool(AnimParam.IsDead,      true);
 
-            // Attack: bool yerine Trigger kullan — animasyon bir kez oynar,
-            // otomatik reset edilir; bool gibi "takılı kalma" riski yoktur.
-            if (HasState(PlayerState.Attack))
-                _animator.SetTrigger(AnimParam.AttackTrigger);
+            
         }
 
         // Speed her frame güncellenmeli; durum geçişine bağlı değil
@@ -233,6 +243,7 @@ namespace FightingGame.Core.Player
         private void TickCooldowns()
         {
             if (_attackCooldownTimer > 0f) _attackCooldownTimer -= Time.deltaTime;
+            if (_dashCooldownTimer  > 0f) _dashCooldownTimer  -= Time.deltaTime;
 
             if (_dashTimer > 0f)
             {
@@ -257,6 +268,7 @@ namespace FightingGame.Core.Player
         private void HandleGravity()
         {
             if (HasState(PlayerState.Dash)) return;
+            if (_isGrounded) return;
             _velocity.y += Gravity * Time.deltaTime;
         }
 
@@ -267,11 +279,49 @@ namespace FightingGame.Core.Player
             float horizontal = GetHorizontalInput();
             _velocity.x      = horizontal * data.moveSpeed;
 
-            if (horizontal != 0f)
-                transform.localScale = new Vector3(Mathf.Sign(horizontal), 1f, 1f);
-
             if (_isGrounded && !HasState(PlayerState.Attack | PlayerState.Block | PlayerState.Crouch))
                 TransitionTo(Mathf.Abs(horizontal) > 0.01f ? PlayerState.Move : PlayerState.Idle);
+        }
+
+        // ── [4] Auto-Face Opponent ──────────────────────────────────────────────────────
+        //
+        // Karakter daima rakibe bakar. Bu, fighting game standardıdır:
+        //   • Sağ tuş = rakibe doğru veya rakipten uzağa hareket; yüz yönü
+        //     buna göre değişmez, hep rakibe dönüktür.
+        //   • Karakterler birbirinin üstünden geçtiğinde (cross-up), yüz otomatik
+        //     karşı tarafa döner.
+        //
+        // Saldırı/Hit/Dead/Dash gibi "commit" durumlarında facing güncellenmez;
+        // bu sayede animasyon ortasında ani yön değişikliği olmaz.
+
+        /// <summary>
+        /// Rakip transform'unu runtime'da atar. MatchManager tarafından
+        /// (veya başka bir orkestratör tarafından) çağrılır.
+        ///
+        /// Bu metot, BasePlayer'ı sahnedeki diğer nesneleri keşfetme
+        /// sorumluluğundan kurtarır (Single Responsibility): player kendi
+        /// rakibini aramaz, ona söylenen rakibe bakar.
+        /// </summary>
+        public void SetOpponent(Transform opponentTransform)
+        {
+            opponent = opponentTransform;
+        }
+
+        private void UpdateFacing()
+        {
+            if (opponent == null) return;
+            if (HasState(PlayerState.Attack | PlayerState.Hit | PlayerState.Dead | PlayerState.Dash)) return;
+
+            float dx = opponent.position.x - transform.position.x;
+
+            // Çok yakın olduklarında (üst üste binme) jitter yapmasın
+            if (Mathf.Abs(dx) < 0.01f) return;
+
+            bool faceRight = dx > 0f;
+            transform.rotation = Quaternion.Euler(
+                0f,
+                faceRight ? _defaultYRotation : _defaultYRotation + 180f,
+                0f);
         }
 
         // ── [2] Physical Crouch ─────────────────────────────────────────────────────────
@@ -316,16 +366,33 @@ namespace FightingGame.Core.Player
         private void HandleDash()
         {
             if (HasState(PlayerState.Dead | PlayerState.Dash)) return;
+            if (_dashCooldownTimer > 0f) return;
             if (!GetDashInput()) return;
 
+            // Yön belirleme:
+            //   • Yatay input varsa, o yöne dash.
+            //   • Yoksa karakterin baktığı yöne dash.
+            // Önceden transform.localScale.x kullanılıyordu; rotation'a geçince
+            // bu değer hep 1 kalıyor (bug). Bunun yerine rotation'dan facing
+            // sign üretiyoruz.
             float horizontal = GetHorizontalInput();
-            Vector3 dir      = new Vector3(
-                horizontal != 0f ? Mathf.Sign(horizontal) : transform.localScale.x,
-                0f, 0f);
+            float dirSign    = horizontal != 0f ? Mathf.Sign(horizontal) : GetFacingSign();
 
-            _dashTimer = 0.2f;
-            _velocity  = dir * data.moveSpeed * 2.5f;
+            _dashTimer         = 0.2f;
+            _dashCooldownTimer = data.dashCooldown;
+            _velocity          = new Vector3(dirSign, 0f, 0f) * data.moveSpeed * 2.5f;
             TransitionTo(PlayerState.Dash);
+        }
+
+        /// <summary>
+        /// Karakterin baktığı yönü +1 (sağ) veya -1 (sol) olarak döndürür.
+        /// _defaultYRotation "sağ" kabul edilir; mevcut Y rotation'a olan
+        /// fark 90°'den küçükse sağa, büyükse sola bakıyor demektir.
+        /// </summary>
+        private float GetFacingSign()
+        {
+            float deltaY = Mathf.DeltaAngle(_defaultYRotation, transform.eulerAngles.y);
+            return Mathf.Abs(deltaY) < 90f ? 1f : -1f;
         }
 
         // ── [3] Attack Sync ─────────────────────────────────────────────────────────
@@ -347,9 +414,7 @@ namespace FightingGame.Core.Player
             TransitionTo(PlayerState.Attack);
 
             if (_animator != null)
-                {
-                    _animator.SetTrigger("AttackTrigger");
-                }
+                _animator.SetTrigger(AnimParam.AttackTrigger);
 
             if (!useAnimationEventSync)
             {
@@ -369,7 +434,20 @@ namespace FightingGame.Core.Player
         {
             if (!HasState(PlayerState.Attack)) return;
             PerformHitboxCheck();
-            Invoke(nameof(ResetAfterAttack), 0.05f);
+        }
+
+        /// <summary>
+        /// Animation Event ile saldırı animasyonunun SON karesinde çağrılır.
+        /// Karakteri Idle/Jump durumuna geri döndürür.
+        /// Function : OnAttackEndFrame  (parametre yok)
+        ///
+        /// Avantaj: Idle'a dönüş anı animasyonun gerçek bitişiyle senkronize
+        /// olur. Ninja'nın 0.4 sn'lik, Golem'in 1.2 sn'lik saldırısı için
+        /// ekstra ayar gerekmez; her karakter kendi animasyon süresine uyar.
+        /// </summary>
+        public void OnAttackEndFrame()
+        {
+            ResetAfterAttack();
         }
 
         private void ResetAfterAttack()
