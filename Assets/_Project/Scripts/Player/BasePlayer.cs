@@ -36,18 +36,17 @@ namespace FightingGame.Core.Player
     // ~%30 daha hızlı yapar. Her frame çağrıldığı için fark önemlidir.
     internal static class AnimParam
     {
-        public static readonly int Speed       = Animator.StringToHash("Speed");
-        public static readonly int IsJumping   = Animator.StringToHash("isJumping");
-        public static readonly int IsAttacking = Animator.StringToHash("isAttacking");
-        public static readonly int IsCrouching = Animator.StringToHash("isCrouching");
-        public static readonly int IsBlocking  = Animator.StringToHash("isBlocking");
-        public static readonly int IsHit       = Animator.StringToHash("isHit");
-        public static readonly int IsDead      = Animator.StringToHash("isDead");
-        public static readonly int AttackTrigger = Animator.StringToHash("AttackTrigger");
+        public static readonly int Speed        = Animator.StringToHash("Speed");
+        public static readonly int IsJumping    = Animator.StringToHash("isJumping");
+        public static readonly int IsCrouching  = Animator.StringToHash("isCrouching");
+        public static readonly int IsBlocking   = Animator.StringToHash("isBlocking");
+        public static readonly int IsHit        = Animator.StringToHash("isHit");
+        public static readonly int IsDead       = Animator.StringToHash("isDead");
+        public static readonly int AttackTrigger = Animator.StringToHash("AttackTrigger");  // Animator'daki gerçek isim
     }
 
     [RequireComponent(typeof(CharacterController))]
-    [RequireComponent(typeof(Animator))]            // [1] Animator zorunlu bileşen
+    //[RequireComponent(typeof(Animator))]            // [1] Animator zorunlu bileşen
     public abstract class BasePlayer : MonoBehaviour, IDamageable
     {
         // ── Inspector Alanları ───────────────────────────────────────────────────────
@@ -121,7 +120,7 @@ namespace FightingGame.Core.Player
         protected virtual void Awake()
         {
             _cc       = GetComponent<CharacterController>();
-            _animator = GetComponent<Animator>();           // [1]
+            _animator = GetComponentInChildren<Animator>(); // Animator çocuk objede (dvl_mdl_guts)
 
             if (data == null)
             {
@@ -154,17 +153,9 @@ namespace FightingGame.Core.Player
 
         protected virtual void LateUpdate()
         {
-            // Adjust visual mesh position to lock visuals to the ground
-            if (visualMesh != null)
-            {
-                // visualMesh.localPosition = new Vector3(
-                //     visualMesh.localPosition.x,
-                //     _cc.center.y - (_cc.height / 2f),
-                //     visualMesh.localPosition.z
-                // );
-                visualMesh.localPosition = new Vector3(0, _cc.height / 2f, 0);
-            }
+
         }
+
 
         // ── IDamageable ─────────────────────────────────────────────────────────────
 
@@ -209,7 +200,6 @@ namespace FightingGame.Core.Player
 
             // Tüm bool'ları sıfırla
             _animator.SetBool(AnimParam.IsJumping,   false);
-            _animator.SetBool(AnimParam.IsAttacking, false);
             _animator.SetBool(AnimParam.IsCrouching, false);
             _animator.SetBool(AnimParam.IsBlocking,  false);
             _animator.SetBool(AnimParam.IsHit,       false);
@@ -226,17 +216,16 @@ namespace FightingGame.Core.Player
             // otomatik reset edilir; bool gibi "takılı kalma" riski yoktur.
             if (HasState(PlayerState.Attack))
                 _animator.SetTrigger(AnimParam.AttackTrigger);
-
-            // isAttacking bool'u, Animator Controller'daki geçiş koşulları için
-            // (örn. "havada saldırı" blend tree) ek bilgi olarak tutulur.
-            _animator.SetBool(AnimParam.IsAttacking, HasState(PlayerState.Attack));
         }
 
         // Speed her frame güncellenmeli; durum geçişine bağlı değil
         private void UpdateAnimatorLocomotion()
         {
             if (_animator == null) return;
-            _animator.SetFloat(AnimParam.Speed, Mathf.Abs(_velocity.x));
+            //_animator.SetFloat(AnimParam.Speed, Mathf.Abs(_velocity.x));
+            Vector3 horizontalVelocity = new Vector3(_cc.velocity.x, 0, _cc.velocity.z);
+            float currentSpeed = horizontalVelocity.magnitude;
+            _animator.SetFloat(AnimParam.Speed, currentSpeed);
         }
 
         // ── Hareket Sistemleri ──────────────────────────────────────────────────────────
@@ -356,6 +345,11 @@ namespace FightingGame.Core.Player
 
             _attackCooldownTimer = data.attackCooldown;
             TransitionTo(PlayerState.Attack);
+
+            if (_animator != null)
+                {
+                    _animator.SetTrigger("AttackTrigger");
+                }
 
             if (!useAnimationEventSync)
             {
