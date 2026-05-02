@@ -113,6 +113,8 @@ namespace FightingGame.Core.Player
         private float   _dashTimer;
         private float   _attackCooldownTimer;
         private float _targetHeight;
+        [Header("Targeting")]
+        public Transform opponent;
         private const float Gravity = -20f;
 
         // ── Unity Lifecycle ────────────────────────────────────────────────────────
@@ -133,11 +135,11 @@ namespace FightingGame.Core.Player
             _cc.center = new Vector3(0, standingHeight / 2f, 0);
             _targetHeight = standingHeight;
         }
-
+        
         protected virtual void Update()
         {
             if (!IsAlive) return;
-
+            HandleOrientation();
             TickCooldowns();
             CheckGround();
             HandleGravity();
@@ -149,6 +151,23 @@ namespace FightingGame.Core.Player
             HandleBlock();
             ApplyMovement();
             UpdateAnimatorLocomotion();                     // [1] Speed her frame güncellenir
+        }
+        private void HandleOrientation()
+        {
+            if (opponent == null) return;
+
+            // Rakip sağda mı solda mı kontrol et
+            bool opponentIsRight = opponent.position.x > transform.position.x;
+
+            // Karakteri rakibe döndür (Aynalama yapmadan, sadece döndürerek)
+            if (opponentIsRight)
+                {
+                     transform.rotation = Quaternion.Euler(0, 90, 0); // Karakterin default yönüne göre 0 veya 90
+                }
+            else
+                {
+                    transform.rotation = Quaternion.Euler(0, -90, 0); // Karakteri tam tersine döndür
+                }
         }
 
         protected virtual void LateUpdate()
@@ -231,18 +250,18 @@ namespace FightingGame.Core.Player
         private void UpdateAnimatorLocomotion()
             {
                 if (_animator == null) return;
+                // Input değerini al (Örn: horizontal = -1, 0, 1)
+                float moveInput = Input.GetAxisRaw("Horizontal");
 
-                // 1. Fiziksel hızı hesapla (Y eksenini yoksayarak)
-                Vector3 horizontalVelocity = new Vector3(_cc.velocity.x, 0, _cc.velocity.z);
-                float currentSpeed = horizontalVelocity.magnitude;
+                // Rakibe göre yönü belirle
+                float directionMultiplier = (opponent != null && opponent.position.x < transform.position.x) ? -1f : 1f;
 
-                // 2. Sürdürülebilirlik için yumuşatma değerini veriden al
-                // Eğer data içinde tanımlı değilse varsayılan 0.1f kullan
-                float targetDamp = (currentSpeed > 0.1f) ? data.startDampTime : data.stopDampTime;
+                // Blend Tree için hızı hesapla
+                // Eğer rakip soldaysa ve biz sağa (+1) basıyorsak, hız -1 olur (Geri yürüme)
+                float relativeSpeed = moveInput * directionMultiplier;
 
-                // 3. Profesyonel yöntem: SetFloat DampTime
-                // Bu metod, Speed değerini currentSpeed hedefine 'locomotionSmoothness' süresinde ulaştırır
-                _animator.SetFloat(AnimParam.Speed, currentSpeed, targetDamp, Time.deltaTime);
+                _animator.SetFloat(AnimParam.Speed, relativeSpeed, data.locomotionDampTime, Time.deltaTime);
+
             }
 
         // ── Hareket Sistemleri ──────────────────────────────────────────────────────────
@@ -283,9 +302,6 @@ namespace FightingGame.Core.Player
 
             float horizontal = GetHorizontalInput();
             _velocity.x      = horizontal * data.moveSpeed;
-
-            if (horizontal != 0f)
-                transform.localScale = new Vector3(Mathf.Sign(horizontal), 1f, 1f);
 
             if (_isGrounded && !HasState(PlayerState.Attack | PlayerState.Block | PlayerState.Crouch))
                 TransitionTo(Mathf.Abs(horizontal) > 0.01f ? PlayerState.Move : PlayerState.Idle);

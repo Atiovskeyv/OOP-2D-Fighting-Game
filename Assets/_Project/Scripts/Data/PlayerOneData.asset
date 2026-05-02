@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb574560b1d25144aa0540ed25ef3474, type: 3}
   m_Name: PlayerOneData
   m_EditorClassIdentifier: Assembly-CSharp::FightingGame.Core.Data.CharacterData
-  locomotionDampTime: 0.15
+  locomotionDampTime: 0.1
   startDampTime: 0.1
-  stopDampTime: 0.1
+  stopDampTime: 0.05
   characterName: Player One
   maxHealth: 100
-  moveSpeed: 3
+  moveSpeed: 2.4
   jumpForce: 9
   attackPower: 40
   attackCooldown: 0.3

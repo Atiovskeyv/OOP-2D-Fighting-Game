@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!206 &-6137623774703074695
+--- !u!206 &-6095181149837611898
 BlendTree:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,6 +8,14 @@ BlendTree:
   m_PrefabAsset: {fileID: 0}
   m_Name: Blend Tree
   m_Childs:
+  - serializedVersion: 2
+    m_Motion: {fileID: -203655887218126122, guid: 7c1eb155b5ec424479aa08cc07c5184b, type: 3}
+    m_Threshold: -1
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 2
+    m_CycleOffset: 0
+    m_DirectBlendParameter: Speed
+    m_Mirror: 0
   - serializedVersion: 2
     m_Motion: {fileID: 1391218145530079867, guid: cb27f8c6d63b38f408dc7894b317fe0f, type: 3}
     m_Threshold: 0
@@ -17,21 +25,21 @@ BlendTree:
     m_DirectBlendParameter: Speed
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: -203655887218126122, guid: 64d2779469524e84da5f950886d6a663, type: 3}
-    m_Threshold: 0.5
+    m_Motion: {fileID: -203655887218126122, guid: 9bda664c5ce799b42a968295181d2d84, type: 3}
+    m_Threshold: 1
     m_Position: {x: 0, y: 0}
-    m_TimeScale: 1.2
+    m_TimeScale: 1.5
     m_CycleOffset: 0
     m_DirectBlendParameter: Speed
     m_Mirror: 0
   m_BlendParameter: Speed
   m_BlendParameterY: Speed
-  m_MinThreshold: 0
-  m_MaxThreshold: 0.5
-  m_UseAutomaticThresholds: 1
+  m_MinThreshold: -1
+  m_MaxThreshold: 1
+  m_UseAutomaticThresholds: 0
   m_NormalizedBlendValues: 0
   m_BlendType: 0
---- !u!1102 &-588770225136914782
+--- !u!1102 &-233142246762346199
 AnimatorState:
   serializedVersion: 6
   m_ObjectHideFlags: 1
@@ -51,12 +59,12 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -6137623774703074695}
+  m_Motion: {fileID: -6095181149837611898}
   m_Tag: 
-  m_SpeedParameter: Speed
-  m_MirrorParameter: 
+  m_SpeedParameter: 
+  m_MirrorParameter: isJumping
   m_CycleOffsetParameter: 
-  m_TimeParameter: Speed
+  m_TimeParameter: 
 --- !u!91 &9100000
 AnimatorController:
   m_ObjectHideFlags: 0
@@ -138,8 +146,8 @@ AnimatorStateMachine:
   m_Name: Base Layer
   m_ChildStates:
   - serializedVersion: 1
-    m_State: {fileID: -588770225136914782}
-    m_Position: {x: 300, y: 120, z: 0}
+    m_State: {fileID: -233142246762346199}
+    m_Position: {x: 300, y: 130, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []
@@ -149,4 +157,4 @@ AnimatorStateMachine:
   m_EntryPosition: {x: 320, y: 250, z: 0}
   m_ExitPosition: {x: 650, y: 40, z: 0}
   m_ParentStateMachinePosition: {x: 800, y: 20, z: 0}
-  m_DefaultState: {fileID: -588770225136914782}
+  m_DefaultState: {fileID: -233142246762346199}
