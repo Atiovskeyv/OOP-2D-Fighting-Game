@@ -7,6 +7,8 @@
 //    [1] Animator entegrasyonu  — OnStateChanged içinde parametre güncelleme
 //    [2] Physical Crouch        — CharacterController.height dinamik ayarı
 //    [3] Attack Sync            — Animation Event ile tetiklenebilir hitbox
+//    [4] Auto-Face Opponent     — rakibe doğru otomatik dönme (rotation tabanlı)
+//    [5] Flags state machine    — birden fazla state aynı anda aktif olabilir
 // ============================================================
 
 using System;
@@ -16,6 +18,10 @@ using FightingGame.Core.Interfaces;
 
 namespace FightingGame.Core.Player
 {
+    // [5] PlayerState [Flags] olarak tutuluyor.
+    // Karakter aynı anda birden fazla state'te bulunabilir (örn. Jump + Attack
+    // = "hava saldırısı"; Move + Block = "yürüyerek savunma" vb.).
+    // CurrentState tek bir bayrak ya da bayrakların OR birleşimi olabilir.
     [Flags]
     public enum PlayerState
     {
@@ -36,13 +42,13 @@ namespace FightingGame.Core.Player
     // ~%30 daha hızlı yapar. Her frame çağrıldığı için fark önemlidir.
     internal static class AnimParam
     {
-        public static readonly int Speed        = Animator.StringToHash("Speed");
-        public static readonly int IsJumping    = Animator.StringToHash("isJumping");
-        public static readonly int IsCrouching  = Animator.StringToHash("isCrouching");
-        public static readonly int IsBlocking   = Animator.StringToHash("isBlocking");
-        public static readonly int IsHit        = Animator.StringToHash("isHit");
-        public static readonly int IsDead       = Animator.StringToHash("isDead");
-        public static readonly int AttackTrigger = Animator.StringToHash("AttackTrigger");  // Animator'daki gerçek isim
+        public static readonly int Speed         = Animator.StringToHash("Speed");
+        public static readonly int IsJumping     = Animator.StringToHash("isJumping");
+        public static readonly int IsCrouching   = Animator.StringToHash("isCrouching");
+        public static readonly int IsBlocking    = Animator.StringToHash("isBlocking");
+        public static readonly int IsHit         = Animator.StringToHash("isHit");
+        public static readonly int IsDead        = Animator.StringToHash("isDead");
+        public static readonly int AttackTrigger = Animator.StringToHash("AttackTrigger");
     }
 
     [RequireComponent(typeof(CharacterController))]
@@ -58,6 +64,12 @@ namespace FightingGame.Core.Player
         [Tooltip("Saldırı hitbox merkezi (child GameObject).")]
         [SerializeField] private Transform attackPoint;
         [SerializeField] private LayerMask enemyLayer;
+
+        [Header("Opponent")]
+        [Tooltip("Karakterin yüzünü döndüğü rakip transform'u.\n" +
+                 "Normal akış: MatchManager runtime'da SetOpponent(...) ile atar.\n" +
+                 "Bu alan ad-hoc test için manuel override olarak kullanılabilir; üretim sahnelerinde boş bırakılması beklenir.")]
+        [SerializeField] private Transform opponent;
 
         [Header("Ground Check")]
         [SerializeField] private Transform groundCheck;
@@ -86,9 +98,9 @@ namespace FightingGame.Core.Player
         [SerializeField] private bool useAnimationEventSync = true;
 
         // ── Visual Settings ─────────────────────────────────────────────────────────
-        
+
         [Header("Visual Settings")]
-        [SerializeField] protected Transform visualMesh; // New addition for visual synchronization
+        [SerializeField] protected Transform visualMesh; // Görsel senkronizasyon için
 
         // ── IDamageable ─────────────────────────────────────────────────────────────
 
@@ -110,11 +122,10 @@ namespace FightingGame.Core.Player
 
         private Vector3 _velocity;
         private bool    _isGrounded;
-        private float   _dashTimer;
+        private float   _dashTimer;             // dash hareketinin kendi süresi (~0.2s)
+        private float   _dashCooldownTimer;     // bir sonraki dash atılana kadar bekleme
         private float   _attackCooldownTimer;
-        private float _targetHeight;
-        [Header("Targeting")]
-        public Transform opponent;
+        private float   _targetHeight;
         private const float Gravity = -20f;
 
         // ── Unity Lifecycle ────────────────────────────────────────────────────────
@@ -132,14 +143,14 @@ namespace FightingGame.Core.Player
 
             _currentHealth         = data.maxHealth;
             _cc.height             = standingHeight;        // [2] başlangıç yüksekliği
-            _cc.center = new Vector3(0, standingHeight / 2f, 0);
-            _targetHeight = standingHeight;
+            _cc.center             = new Vector3(0f, standingHeight / 2f, 0f);
+            _targetHeight          = standingHeight;
         }
-        
+
         protected virtual void Update()
         {
             if (!IsAlive) return;
-            HandleOrientation();
+
             TickCooldowns();
             CheckGround();
             HandleGravity();
@@ -150,24 +161,8 @@ namespace FightingGame.Core.Player
             HandleAttack();
             HandleBlock();
             ApplyMovement();
+            HandleOrientation();                            // [4] Rakibe doğru bakma
             UpdateAnimatorLocomotion();                     // [1] Speed her frame güncellenir
-        }
-        private void HandleOrientation()
-        {
-            if (opponent == null) return;
-
-            // Rakip sağda mı solda mı kontrol et
-            bool opponentIsRight = opponent.position.x > transform.position.x;
-
-            // Karakteri rakibe döndür (Aynalama yapmadan, sadece döndürerek)
-            if (opponentIsRight)
-                {
-                     transform.rotation = Quaternion.Euler(0, 90, 0); // Karakterin default yönüne göre 0 veya 90
-                }
-            else
-                {
-                    transform.rotation = Quaternion.Euler(0, -90, 0); // Karakteri tam tersine döndür
-                }
         }
 
         protected virtual void LateUpdate()
@@ -203,6 +198,9 @@ namespace FightingGame.Core.Player
             OnStateChanged(previous, newState);             // sonra alt sınıf hook'u
         }
 
+        // [5] Bitwise kontrol — flag tek bir state ya da OR'lu birden fazla state olabilir.
+        //   HasState(PlayerState.Attack)                       → tekli kontrol
+        //   HasState(PlayerState.Dead | PlayerState.Hit)       → ikisinden biri aktif mi?
         protected bool HasState(PlayerState flag) => (CurrentState & flag) != 0;
 
         protected virtual void OnStateChanged(PlayerState previous, PlayerState next) { }
@@ -212,63 +210,54 @@ namespace FightingGame.Core.Player
         // Tüm bool parametreleri her geçişte sıfırlanıp yalnızca aktif durum
         // true yapılır. Bu "resetle, sonra set et" yaklaşımı, yanlış kalan
         // bool'lardan kaynaklanan animasyon takılmalarını önler.
+        //
+        // NOT: Attack için trigger BURADA fırlatılmaz; çift tetiklenme bug'ını
+        // önlemek için yalnızca HandleAttack() içinden bir kez fırlatılır.
 
         private void SyncAnimator(PlayerState previous, PlayerState next)
         {
             if (_animator == null) return;
 
-            // Tüm bool'ları sıfırla
             _animator.SetBool(AnimParam.IsJumping,   false);
             _animator.SetBool(AnimParam.IsCrouching, false);
             _animator.SetBool(AnimParam.IsBlocking,  false);
             _animator.SetBool(AnimParam.IsHit,       false);
             _animator.SetBool(AnimParam.IsDead,      false);
 
-            // Yeni duruma göre ilgili parametreyi aç
-            if      (HasState(PlayerState.Jump))   _animator.SetBool(AnimParam.IsJumping,   true);
-            else if (HasState(PlayerState.Crouch)) _animator.SetBool(AnimParam.IsCrouching, true);
-            else if (HasState(PlayerState.Block))  _animator.SetBool(AnimParam.IsBlocking,  true);
-            else if (HasState(PlayerState.Hit))    _animator.SetBool(AnimParam.IsHit,       true);
-            else if (HasState(PlayerState.Dead))   _animator.SetBool(AnimParam.IsDead,      true);
-
-            // Attack: bool yerine Trigger kullan — animasyon bir kez oynar,
-            // otomatik reset edilir; bool gibi "takılı kalma" riski yoktur.
-            if (HasState(PlayerState.Attack))
-                _animator.SetTrigger(AnimParam.AttackTrigger);
+            // [5] Birden fazla state aktif olabileceği için OR'lu HasState kullanılır.
+            // Birden fazla bool aynı anda true olabilir (örn. Jump + Block).
+            if (HasState(PlayerState.Jump))   _animator.SetBool(AnimParam.IsJumping,   true);
+            if (HasState(PlayerState.Crouch)) _animator.SetBool(AnimParam.IsCrouching, true);
+            if (HasState(PlayerState.Block))  _animator.SetBool(AnimParam.IsBlocking,  true);
+            if (HasState(PlayerState.Hit))    _animator.SetBool(AnimParam.IsHit,       true);
+            if (HasState(PlayerState.Dead))   _animator.SetBool(AnimParam.IsDead,      true);
         }
 
-        // Speed her frame güncellenmeli; durum geçişine bağlı değil
-        // private void UpdateAnimatorLocomotion()
-        // {
-        //     if (_animator == null) return;
-        //     //_animator.SetFloat(AnimParam.Speed, Mathf.Abs(_velocity.x));
-        //     Vector3 horizontalVelocity = new Vector3(_cc.velocity.x, 0, _cc.velocity.z);
-        //     float currentSpeed = horizontalVelocity.magnitude;
-        //     _animator.SetFloat(AnimParam.Speed, currentSpeed);
-        // }
-
+        // [2] Speed her frame güncellenmeli; durum geçişine bağlı değil.
+        // Geliştirici A'nın yaklaşımı: Input ve rakibin pozisyonuna göre
+        // -1..1 aralığında relativeSpeed üretilir; Blend Tree (Geri/İleri yürüme)
+        // bu değere göre çalışır.
         private void UpdateAnimatorLocomotion()
-            {
-                if (_animator == null) return;
-                // Input değerini al (Örn: horizontal = -1, 0, 1)
-                float moveInput = Input.GetAxisRaw("Horizontal");
+        {
+            if (_animator == null) return;
 
-                // Rakibe göre yönü belirle
-                float directionMultiplier = (opponent != null && opponent.position.x < transform.position.x) ? -1f : 1f;
+            float moveInput = GetHorizontalInput();
 
-                // Blend Tree için hızı hesapla
-                // Eğer rakip soldaysa ve biz sağa (+1) basıyorsak, hız -1 olur (Geri yürüme)
-                float relativeSpeed = moveInput * directionMultiplier;
+            // Rakip soldaysa input işaretini ters çevir → +1 hep "rakibe doğru"
+            float directionMultiplier =
+                (opponent != null && opponent.position.x < transform.position.x) ? -1f : 1f;
 
-                _animator.SetFloat(AnimParam.Speed, relativeSpeed, data.locomotionDampTime, Time.deltaTime);
+            float relativeSpeed = moveInput * directionMultiplier;
 
-            }
+            _animator.SetFloat(AnimParam.Speed, relativeSpeed, data.locomotionDampTime, Time.deltaTime);
+        }
 
         // ── Hareket Sistemleri ──────────────────────────────────────────────────────────
 
         private void TickCooldowns()
         {
             if (_attackCooldownTimer > 0f) _attackCooldownTimer -= Time.deltaTime;
+            if (_dashCooldownTimer   > 0f) _dashCooldownTimer   -= Time.deltaTime;
 
             if (_dashTimer > 0f)
             {
@@ -290,9 +279,13 @@ namespace FightingGame.Core.Player
                 _velocity.y = -2f;
         }
 
+        // [3] Yerdeyken velocity.y'yi sürekli düşürmeyiz; aksi halde
+        // CharacterController.Move zemine doğru sürekli "iter" ve eğimli
+        // yüzeylerde kayma/jitter görülür.
         private void HandleGravity()
         {
             if (HasState(PlayerState.Dash)) return;
+            if (_isGrounded) return;
             _velocity.y += Gravity * Time.deltaTime;
         }
 
@@ -305,6 +298,48 @@ namespace FightingGame.Core.Player
 
             if (_isGrounded && !HasState(PlayerState.Attack | PlayerState.Block | PlayerState.Crouch))
                 TransitionTo(Mathf.Abs(horizontal) > 0.01f ? PlayerState.Move : PlayerState.Idle);
+        }
+
+        // ── [4] Auto-Face Opponent ──────────────────────────────────────────────────────
+        //
+        // Karakter daima rakibe bakar. Bu, fighting game standardıdır:
+        //   • Sağ tuş = rakibe doğru veya rakipten uzağa hareket; yüz yönü
+        //     buna göre değişmez, hep rakibe dönüktür.
+        //   • Karakterler birbirinin üstünden geçtiğinde (cross-up), yüz otomatik
+        //     karşı tarafa döner.
+        //
+        // KRİTİK: localScale.x = -1 gibi mirroring KULLANILMAZ (skeletal
+        // animasyonların normal'leri ters döner). Yalnızca transform.rotation.
+
+        /// <summary>
+        /// Rakip transform'unu runtime'da atar. MatchManager tarafından
+        /// (veya başka bir orkestratör tarafından) çağrılır.
+        ///
+        /// Bu metot, BasePlayer'ı sahnedeki diğer nesneleri keşfetme
+        /// sorumluluğundan kurtarır (Single Responsibility): player kendi
+        /// rakibini aramaz, ona söylenen rakibe bakar.
+        /// </summary>
+        public void SetOpponent(Transform opponentTransform)
+        {
+            opponent = opponentTransform;
+        }
+
+        private void HandleOrientation()
+        {
+            if (opponent == null) return;
+
+            // Rakip sağda mı solda mı kontrol et
+            bool opponentIsRight = opponent.position.x > transform.position.x;
+
+            // Karakteri rakibe döndür (Aynalama yapmadan, sadece döndürerek)
+            if (opponentIsRight)
+            {
+                transform.rotation = Quaternion.Euler(0f, 90f, 0f);
+            }
+            else
+            {
+                transform.rotation = Quaternion.Euler(0f, -90f, 0f);
+            }
         }
 
         // ── [2] Physical Crouch ─────────────────────────────────────────────────────────
@@ -326,8 +361,8 @@ namespace FightingGame.Core.Player
             float targetHeight = HasState(PlayerState.Crouch) ? crouchHeight : standingHeight;
             float newHeight    = Mathf.Lerp(_cc.height, targetHeight, crouchLerpSpeed * Time.deltaTime);
 
-            _cc.height   = newHeight;
-            _cc.center   = new Vector3(0f, newHeight * 0.5f, 0f);
+            _cc.height = newHeight;
+            _cc.center = new Vector3(0f, newHeight * 0.5f, 0f);
         }
 
         private void HandleJump()
@@ -349,24 +384,43 @@ namespace FightingGame.Core.Player
         private void HandleDash()
         {
             if (HasState(PlayerState.Dead | PlayerState.Dash)) return;
+            if (_dashCooldownTimer > 0f) return;
             if (!GetDashInput()) return;
 
+            // Yön belirleme:
+            //   • Yatay input varsa, o yöne dash.
+            //   • Yoksa karakterin baktığı yöne dash.
+            // Önceden transform.localScale.x kullanılıyordu; rotation tabanlı
+            // facing'e geçince bu değer hep 1 kalıyor (bug). Bunun yerine
+            // rotation'dan facing sign üretilir.
             float horizontal = GetHorizontalInput();
-            Vector3 dir      = new Vector3(
-                horizontal != 0f ? Mathf.Sign(horizontal) : transform.localScale.x,
-                0f, 0f);
+            float dirSign    = horizontal != 0f ? Mathf.Sign(horizontal) : GetFacingSign();
 
-            _dashTimer = 0.2f;
-            _velocity  = dir * data.moveSpeed * 2.5f;
+            _dashTimer         = 0.2f;
+            _dashCooldownTimer = data.dashCooldown;
+            _velocity          = new Vector3(dirSign, 0f, 0f) * data.moveSpeed * 2.5f;
             TransitionTo(PlayerState.Dash);
+        }
+
+        /// <summary>
+        /// Karakterin baktığı yönü +1 (sağ) veya -1 (sol) olarak döndürür.
+        /// HandleOrientation kuralı: rotation Y = 90 → sağa, -90 → sola.
+        /// </summary>
+        private float GetFacingSign()
+        {
+            // 90'a olan açısal fark < 90 ise sağa, değilse sola bakıyor.
+            float deltaY = Mathf.DeltaAngle(90f, transform.eulerAngles.y);
+            return Mathf.Abs(deltaY) < 90f ? 1f : -1f;
         }
 
         // ── [3] Attack Sync ─────────────────────────────────────────────────────────
         //
         // useAnimationEventSync == true  → Trigger animator'ı ateşler,
-        //   animasyon vuruş karesine geldiğinde Animation Event üzerinden
+        //   animasyon vuruş karesinde Animation Event üzerinden
         //   OnAttackHitFrame() çağrılır; hasar o anda uygulanır.
-
+        //   Animasyonun SON karesinde OnAttackEndFrame() çağrılır;
+        //   karakter Idle/Jump'a geri döner. Manuel zamanlayıcı yoktur.
+        //
         // useAnimationEventSync == false → eski davranış; anlık hasar.
         //   Animator henüz kurulmamışken geliştirme aşamasında kullanışlıdır.
 
@@ -379,10 +433,11 @@ namespace FightingGame.Core.Player
             _attackCooldownTimer = data.attackCooldown;
             TransitionTo(PlayerState.Attack);
 
+            // [4] string yerine hash — daha hızlı, typo-safe.
+            // Trigger yalnızca burada bir kez fırlatılır (SyncAnimator artık
+            // attack trigger'ını set etmez → çift tetik bug'ı çözüldü).
             if (_animator != null)
-                {
-                    _animator.SetTrigger("AttackTrigger");
-                }
+                _animator.SetTrigger(AnimParam.AttackTrigger);
 
             if (!useAnimationEventSync)
             {
@@ -402,7 +457,20 @@ namespace FightingGame.Core.Player
         {
             if (!HasState(PlayerState.Attack)) return;
             PerformHitboxCheck();
-            Invoke(nameof(ResetAfterAttack), 0.05f);
+        }
+
+        /// <summary>
+        /// Animation Event ile saldırı animasyonunun SON karesinde çağrılır.
+        /// Karakteri Idle/Jump durumuna geri döndürür.
+        /// Function : OnAttackEndFrame  (parametre yok)
+        ///
+        /// Avantaj: Idle'a dönüş anı animasyonun gerçek bitişiyle senkronize
+        /// olur. Ninja'nın 0.4 sn'lik, Golem'in 1.2 sn'lik saldırısı için
+        /// ekstra ayar gerekmez; her karakter kendi animasyon süresine uyar.
+        /// </summary>
+        public void OnAttackEndFrame()
+        {
+            ResetAfterAttack();
         }
 
         private void ResetAfterAttack()
@@ -415,7 +483,7 @@ namespace FightingGame.Core.Player
         {
             if (HasState(PlayerState.Dead | PlayerState.Dash | PlayerState.Attack)) return;
 
-            if (GetBlockInput())      TransitionTo(PlayerState.Block);
+            if (GetBlockInput())                  TransitionTo(PlayerState.Block);
             else if (HasState(PlayerState.Block)) TransitionTo(PlayerState.Idle);
         }
 
@@ -429,7 +497,7 @@ namespace FightingGame.Core.Player
 
             Collider[] hits = Physics.OverlapSphere(
                 attackPoint.position, data.attackRange, enemyLayer);
-            
+
             foreach (Collider hit in hits)
                 if (hit.TryGetComponent<IDamageable>(out var target) && target.IsAlive)
                     target.TakeDamage(data.attackPower);
