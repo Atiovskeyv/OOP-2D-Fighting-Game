@@ -35,6 +35,11 @@ namespace FightingGame.Core.Data
     {
         // ── Genel Bilgiler ───────────────────────────────────────
 
+        [Header("Animation Settings")]
+        public float locomotionDampTime = 0.1f;
+        public float startDampTime = 0.05f; // Kalkış hızı (Daha küçük = Daha hızlı kalkış)
+        public float stopDampTime = 0.15f;  // Duruş hızı (Daha küçük = Daha hızlı duruş)
+
         [Header("General")]
         [Tooltip("Karakter adı. UI ve log mesajlarında kullanılır.")]
         public string characterName = "Unnamed";

@@ -219,14 +219,31 @@ namespace FightingGame.Core.Player
         }
 
         // Speed her frame güncellenmeli; durum geçişine bağlı değil
+        // private void UpdateAnimatorLocomotion()
+        // {
+        //     if (_animator == null) return;
+        //     //_animator.SetFloat(AnimParam.Speed, Mathf.Abs(_velocity.x));
+        //     Vector3 horizontalVelocity = new Vector3(_cc.velocity.x, 0, _cc.velocity.z);
+        //     float currentSpeed = horizontalVelocity.magnitude;
+        //     _animator.SetFloat(AnimParam.Speed, currentSpeed);
+        // }
+
         private void UpdateAnimatorLocomotion()
-        {
-            if (_animator == null) return;
-            //_animator.SetFloat(AnimParam.Speed, Mathf.Abs(_velocity.x));
-            Vector3 horizontalVelocity = new Vector3(_cc.velocity.x, 0, _cc.velocity.z);
-            float currentSpeed = horizontalVelocity.magnitude;
-            _animator.SetFloat(AnimParam.Speed, currentSpeed);
-        }
+            {
+                if (_animator == null) return;
+
+                // 1. Fiziksel hızı hesapla (Y eksenini yoksayarak)
+                Vector3 horizontalVelocity = new Vector3(_cc.velocity.x, 0, _cc.velocity.z);
+                float currentSpeed = horizontalVelocity.magnitude;
+
+                // 2. Sürdürülebilirlik için yumuşatma değerini veriden al
+                // Eğer data içinde tanımlı değilse varsayılan 0.1f kullan
+                float targetDamp = (currentSpeed > 0.1f) ? data.startDampTime : data.stopDampTime;
+
+                // 3. Profesyonel yöntem: SetFloat DampTime
+                // Bu metod, Speed değerini currentSpeed hedefine 'locomotionSmoothness' süresinde ulaştırır
+                _animator.SetFloat(AnimParam.Speed, currentSpeed, targetDamp, Time.deltaTime);
+            }
 
         // ── Hareket Sistemleri ──────────────────────────────────────────────────────────
 
