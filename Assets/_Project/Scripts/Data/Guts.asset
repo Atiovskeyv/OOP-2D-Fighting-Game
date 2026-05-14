@@ -10,13 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fb574560b1d25144aa0540ed25ef3474, type: 3}
-  m_Name: PlayerOneData
+  m_Name: Guts
   m_EditorClassIdentifier: Assembly-CSharp::FightingGame.Core.Data.CharacterData
-  characterName: Player One
+  characterName: Unnamed
   maxHealth: 100
   moveSpeed: 5
   jumpForce: 10
   attackPower: 20
   attackCooldown: 0.5
   attackRange: 1.5
+  dashCooldown: 0.8
   armor: 5
+  hitStunDuration: 0.4
+  skill1Cooldown: 3
+  skill1Damage: 30
+  skill2Cooldown: 10
+  skill2Damage: 50

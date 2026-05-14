@@ -6,20 +6,8 @@
 //
 //  DESIGN PATTERN: Data-Driven Design + ScriptableObject Pattern
 //
-//  ScriptableObject nedir?
-//  -----------------------
-//  MonoBehaviour'dan farklı olarak bir GameObject'e bağlı olmayan,
-//  doğrudan Project penceresinde .asset dosyası olarak yaşayan
-//  Unity veri konteyneridir.
-//
-//  Neden ScriptableObject kullanıyoruz?
-//  -------------------------------------
-//  • Her karakter tipi için ayrı prefab kopyası oluşturmak yerine
-//    tek bir prefab + farklı CharacterData asset'leri yeterli olur.
-//  • Veri ve davranış birbirinden ayrılır (Separation of Concerns).
-//  • Inspector'dan tasarımcılar kod yazmadan yeni karakter oluşturabilir.
-//  • Aynı asset birden fazla nesne tarafından referans alınabilir;
-//    bellek'te yalnızca bir kopya tutulur (flyweight benzeri davranış).
+//  Mevcut dosyanın güncellenmiş versiyonu.
+//  Eklenen: Skill data alanları (skill1/skill2 cooldown, damage)
 //
 // ============================================================
 
@@ -53,7 +41,7 @@ namespace FightingGame.Core.Data
         [Min(0f)]
         public float moveSpeed = 5f;
 
-        [Tooltip("Zıplama kuvveti. Rigidbody2D.AddForce ile kullanılır.")]
+        [Tooltip("Zıplama kuvveti.")]
         [Min(0f)]
         public float jumpForce = 10f;
 
@@ -75,9 +63,7 @@ namespace FightingGame.Core.Data
         // ── Dash ────────────────────────────────────────────────
 
         [Header("Dash")]
-        [Tooltip("İki ardışık dash arasındaki minimum bekleme süresi (saniye).\n" +
-                 "Sayaç dash başlangıcında işler; dash hareketinin kendisi (~0.2s)\n" +
-                 "bu sürenin içindedir, yani 0.8 cooldown ≈ 0.6s gerçek bekleme.")]
+        [Tooltip("İki ardışık dash arasındaki minimum bekleme süresi (saniye).")]
         [Min(0f)]
         public float dashCooldown = 0.8f;
 
@@ -88,13 +74,34 @@ namespace FightingGame.Core.Data
         [Min(0)]
         public int armor = 5;
 
+        [Tooltip("Hasar alındığında Hit state'inde kalınacak süre (saniye). " +
+                 "Bu süre dolunca karakter otomatik olarak Idle/Jump state'ine döner.")]
+        [Min(0f)]
+        public float hitStunDuration = 0.4f;
+
+        // ── Skill Data (YENİ) ───────────────────────────────────
+
+        [Header("Skill 1 (Q Skill)")]
+        [Tooltip("Skill 1 bekleme süresi (saniye).")]
+        [Min(0f)]
+        public float skill1Cooldown = 3f;
+
+        [Tooltip("Skill 1 hasar değeri.")]
+        [Min(0)]
+        public int skill1Damage = 30;
+
+        [Header("Skill 2 (Ultimate)")]
+        [Tooltip("Skill 2 (Ultimate) bekleme süresi (saniye).")]
+        [Min(0f)]
+        public float skill2Cooldown = 10f;
+
+        [Tooltip("Skill 2 hasar değeri.")]
+        [Min(0)]
+        public int skill2Damage = 50;
+
         // ── Validasyon ──────────────────────────────────────────
- 
+
 #if UNITY_EDITOR
-        /// <summary>
-        /// Inspector'da bir değer değiştirildiğinde Unity bu metodu çağırır.
-        /// Tutarsız veri girişlerine karşı erken uyarı verir.
-        /// </summary>
         private void OnValidate()
         {
             if (maxHealth <= 0)
