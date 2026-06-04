@@ -19,7 +19,8 @@ MonoBehaviour:
   maxHealth: 100
   moveSpeed: 2.4
   jumpForce: 9
-  attackPower: 40
+  attackPower: 50
   attackCooldown: 0.3
   attackRange: 1.5
+  dashCooldown: 0.8
   armor: 5
