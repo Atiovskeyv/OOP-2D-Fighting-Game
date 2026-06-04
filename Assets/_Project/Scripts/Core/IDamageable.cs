@@ -30,8 +30,8 @@ namespace FightingGame.Core.Interfaces
     /// <para>
     /// Implementasyon örnekleri:
     /// <list type="bullet">
-    ///   <item><description>PlayerHealth : MonoBehaviour, IDamageable</description></item>
-    ///   <item><description>EnemyHealth   : MonoBehaviour, IDamageable</description></item>
+    ///   <item><description>AbstractCharacter : MonoBehaviour, ICharacter, IDamageable</description></item>
+    ///   <item><description>TargetDummy : MonoBehaviour, IDamageable</description></item>
     ///   <item><description>BreakableObject : MonoBehaviour, IDamageable</description></item>
     /// </list>
     /// </para>
