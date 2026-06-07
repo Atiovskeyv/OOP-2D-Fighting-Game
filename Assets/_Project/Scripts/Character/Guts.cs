@@ -23,22 +23,15 @@ namespace FightingGame.Character
     /// </summary>
     public class Guts : AbstractCharacter
     {
-        [Header("Guts Skills")]
-        [SerializeField] private float skill1Cooldown = 4f;
-        [SerializeField] private float skill2Cooldown = 12f;
-        [SerializeField] private float skill2Duration = 5f;
+        [Header("Guts — Berserker Zırhı")]
+        [SerializeField] private float berserkerDuration = 5f;
 
-        private float _skill1Timer;
-        private float _skill2Timer;
         private bool  _berserkerActive;
         private float _berserkerTimer;
 
         protected override void Update()
         {
             base.Update();
-
-            if (_skill1Timer > 0f) _skill1Timer -= Time.deltaTime;
-            if (_skill2Timer > 0f) _skill2Timer -= Time.deltaTime;
 
             // Berserker Zırhı süre takibi
             if (_berserkerActive)
@@ -54,41 +47,41 @@ namespace FightingGame.Character
         }
 
         /// <summary>
-        /// Kılıç Fırtınası — Geniş çaplı yay şeklinde kılıç sallar.
+        /// Kılıç Fırtınası (Skill 1 - Enhanced) — Geniş çaplı yay şeklinde kılıç sallar, yüksek hasar verir.
         /// </summary>
-        public override void Skill1()
+        protected override void OnExecuteSkill1()
         {
-            if (!IsAlive) return;
-            if (_skill1Timer > 0f) return;
-
-            _skill1Timer = skill1Cooldown;
-
-            // TODO: Geniş hitbox + özel animasyon
-            Debug.Log("[Guts] Kılıç Fırtınası! (Skill1)");
+            // TODO: Geniş hitbox + özel animasyon + hasar verme
+            Debug.Log("[Guts] Kılıç Fırtınası! (Enhanced Skill 1)");
         }
 
         /// <summary>
-        /// Berserker Zırhı (Ultimate) — Belirli süre hasar azaltma + saldırı hızı artışı.
+        /// Combo Breaker (Skill 2 - Breaker) — Darbe alırken rakibi püskürtür.
         /// </summary>
-        public override void Skill2()
+        protected override void OnExecuteSkill2()
         {
-            if (!IsAlive) return;
-            if (_skill2Timer > 0f) return;
-            if (_berserkerActive) return;
+            Debug.Log("[Guts] Berserker Savuşu! (Breaker Skill 2)");
+        }
 
-            _skill2Timer     = skill2Cooldown;
+        /// <summary>
+        /// Berserker Zırhı (Skill 3 - Ultimate) — Belirli süre hasar azaltma + saldırı hızı artışı.
+        /// </summary>
+        protected override void OnExecuteSkill3()
+        {
             _berserkerActive = true;
-            _berserkerTimer  = skill2Duration;
+            _berserkerTimer  = berserkerDuration;
 
             // TODO: Hasar azaltma buff'ı + saldırı hızı artışı
             // TODO: Özel animasyon + VFX (kırmızı aura)
-            Debug.Log("[Guts] Berserker Zırhı Aktif! (Skill2)");
+            Debug.Log("[Guts] Berserker Zırhı Aktif! (Ultimate Skill 3)");
         }
 
+#if UNITY_EDITOR
         protected override void OnStateChanged(CharacterState previous, CharacterState next)
         {
             Debug.Log($"[Guts] {previous} → {next}");
         }
+#endif
 
         protected override void OnDeath()
         {

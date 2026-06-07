@@ -40,7 +40,9 @@ namespace FightingGame.Input
 
         private readonly InputAction _moveAction;
         private readonly InputAction _jumpAction;
-        private readonly InputAction _attackAction;
+        private readonly InputAction _punchAction;
+        private readonly InputAction _kickAction;
+        private readonly InputAction _shootAction;
         private readonly InputAction _dashAction;
         private readonly InputAction _blockAction;
         private readonly InputAction _crouchAction;
@@ -51,7 +53,9 @@ namespace FightingGame.Input
 
         private float _horizontalValue;
         private bool  _jumpBuffered;
-        private bool  _attackBuffered;
+        private bool  _punchBuffered;
+        private bool  _kickBuffered;
+        private bool  _shootBuffered;
         private bool  _dashBuffered;
         private bool  _skill1Buffered;
         private bool  _skill2Buffered;
@@ -71,26 +75,34 @@ namespace FightingGame.Input
                 name: "P2_Jump", type: InputActionType.Button,
                 binding: "<Keyboard>/upArrow", interactions: "press");
 
-            _attackAction = new InputAction(
-                name: "P2_Attack", type: InputActionType.Button,
+            _punchAction = new InputAction(
+                name: "P2_Punch", type: InputActionType.Button,
                 binding: "<Keyboard>/numpad1", interactions: "press");
+
+            _kickAction = new InputAction(
+                name: "P2_Kick", type: InputActionType.Button,
+                binding: "<Keyboard>/numpad2", interactions: "press");
+
+            _shootAction = new InputAction(
+                name: "P2_Shoot", type: InputActionType.Button,
+                binding: "<Keyboard>/numpad3", interactions: "press");
 
             _dashAction = new InputAction(
                 name: "P2_Dash", type: InputActionType.Button,
-                binding: "<Keyboard>/numpad3", interactions: "press");
+                binding: "<Keyboard>/numpad0", interactions: "press");
 
             _skill1Action = new InputAction(
                 name: "P2_Skill1", type: InputActionType.Button,
-                binding: "<Keyboard>/numpad4", interactions: "press");
+                binding: "<Keyboard>/numpad5", interactions: "press");
 
             _skill2Action = new InputAction(
                 name: "P2_Skill2", type: InputActionType.Button,
-                binding: "<Keyboard>/numpad5", interactions: "press");
+                binding: "<Keyboard>/numpad6", interactions: "press");
 
             // --- Sürekli basılı aksiyonlar ---
             _blockAction = new InputAction(
                 name: "P2_Block", type: InputActionType.Button,
-                binding: "<Keyboard>/numpad2");
+                binding: "<Keyboard>/numpad4");
 
             _crouchAction = new InputAction(
                 name: "P2_Crouch", type: InputActionType.Button,
@@ -100,7 +112,9 @@ namespace FightingGame.Input
             _moveAction.performed   += ctx => _horizontalValue = ctx.ReadValue<float>();
             _moveAction.canceled    += _   => _horizontalValue = 0f;
             _jumpAction.performed   += _   => _jumpBuffered    = true;
-            _attackAction.performed += _   => _attackBuffered   = true;
+            _punchAction.performed  += _   => _punchBuffered   = true;
+            _kickAction.performed   += _   => _kickBuffered    = true;
+            _shootAction.performed  += _   => _shootBuffered   = true;
             _dashAction.performed   += _   => _dashBuffered     = true;
             _skill1Action.performed += _   => _skill1Buffered   = true;
             _skill2Action.performed += _   => _skill2Buffered   = true;
@@ -119,10 +133,24 @@ namespace FightingGame.Input
             return v;
         }
 
-        public bool GetAttack()
+        public bool GetPunch()
         {
-            bool v = _attackBuffered;
-            _attackBuffered = false;
+            bool v = _punchBuffered;
+            _punchBuffered = false;
+            return v;
+        }
+
+        public bool GetKick()
+        {
+            bool v = _kickBuffered;
+            _kickBuffered = false;
+            return v;
+        }
+
+        public bool GetShoot()
+        {
+            bool v = _shootBuffered;
+            _shootBuffered = false;
             return v;
         }
 
@@ -133,8 +161,16 @@ namespace FightingGame.Input
             return v;
         }
 
+        // ── IKeyboardBinding — Sürekli basılı ───────────────────
+
+        public bool GetBlock()  => _blockAction.IsPressed();
+        public bool GetCrouch() => _crouchAction.IsPressed();
+
+        // ── IKeyboardBinding — Özel Yetenekler ──────────────────
+
         public bool GetSkill1()
         {
+            if (_skill1Buffered && _skill2Buffered) return false;
             bool v = _skill1Buffered;
             _skill1Buffered = false;
             return v;
@@ -142,15 +178,22 @@ namespace FightingGame.Input
 
         public bool GetSkill2()
         {
+            if (_skill1Buffered && _skill2Buffered) return false;
             bool v = _skill2Buffered;
             _skill2Buffered = false;
             return v;
         }
 
-        // ── IKeyboardBinding — Sürekli basılı ───────────────────
-
-        public bool GetBlock()  => _blockAction.IsPressed();
-        public bool GetCrouch() => _crouchAction.IsPressed();
+        public bool GetSkill3()
+        {
+            if (_skill1Buffered && _skill2Buffered)
+            {
+                _skill1Buffered = false;
+                _skill2Buffered = false;
+                return true;
+            }
+            return false;
+        }
 
         // ── IKeyboardBinding — Yaşam Döngüsü ───────────────────
 
@@ -158,7 +201,9 @@ namespace FightingGame.Input
         {
             _moveAction.Enable();
             _jumpAction.Enable();
-            _attackAction.Enable();
+            _punchAction.Enable();
+            _kickAction.Enable();
+            _shootAction.Enable();
             _dashAction.Enable();
             _blockAction.Enable();
             _crouchAction.Enable();
@@ -170,7 +215,9 @@ namespace FightingGame.Input
         {
             _moveAction.Disable();
             _jumpAction.Disable();
-            _attackAction.Disable();
+            _punchAction.Disable();
+            _kickAction.Disable();
+            _shootAction.Disable();
             _dashAction.Disable();
             _blockAction.Disable();
             _crouchAction.Disable();
@@ -182,7 +229,9 @@ namespace FightingGame.Input
         {
             _moveAction?.Dispose();
             _jumpAction?.Dispose();
-            _attackAction?.Dispose();
+            _punchAction?.Dispose();
+            _kickAction?.Dispose();
+            _shootAction?.Dispose();
             _dashAction?.Dispose();
             _blockAction?.Dispose();
             _crouchAction?.Dispose();

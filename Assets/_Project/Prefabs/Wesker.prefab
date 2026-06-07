@@ -1,0 +1,221 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &34832543500291100
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7840342598474647107}
+  m_Layer: 0
+  m_Name: GroundCheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7840342598474647107
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 34832543500291100}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8277274766748102663}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7234022430127369991
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7606588975944310042}
+  m_Layer: 0
+  m_Name: AttackPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7606588975944310042
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7234022430127369991}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8277274766748102663}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &8454506606018582508
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.35054
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.31631
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -16.05676
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+      propertyPath: m_Name
+      value: Wesker
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 3578345db6bd33e489c4af3a1efc62be, type: 2}
+    - target: {fileID: 5866666021909216657, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7606588975944310042}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7840342598474647107}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6986836217197997349}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7580187578466852757}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4047454212294533772}
+  m_SourcePrefab: {fileID: 100100000, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+--- !u!4 &8277274766748102663 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+  m_PrefabInstance: {fileID: 8454506606018582508}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8760936306468678333 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: ec4bd87335e9c4c4f8bc080d8969ac6b, type: 3}
+  m_PrefabInstance: {fileID: 8454506606018582508}
+  m_PrefabAsset: {fileID: 0}
+--- !u!143 &6986836217197997349
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8760936306468678333}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &7580187578466852757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8760936306468678333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c0dccb47b8324b40a4e988b17dbfe92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FightingGame.Character.Wesker
+  data: {fileID: 0}
+  attackPoint: {fileID: 7606588975944310042}
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  opponent: {fileID: 0}
+  groundCheck: {fileID: 7840342598474647107}
+  groundCheckRadius: 0.2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  standingHeight: 2
+  crouchHeight: 1
+  crouchLerpSpeed: 12
+  useAnimationEventSync: 1
+  visualMesh: {fileID: 0}
+  skill1Cooldown: 4
+  skill2Cooldown: 12
+--- !u!114 &4047454212294533772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8760936306468678333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87a3c85b3ed1ad6479e9a16ea87dde53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FightingGame.Player.Player

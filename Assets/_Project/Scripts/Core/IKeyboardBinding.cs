@@ -39,18 +39,24 @@ namespace FightingGame.Core.Interfaces
         /// </summary>
         float GetHorizontal();
 
-        // ── Anlık Aksiyonlar (WasPressedThisFrame) ──────────────
+        // ── Anlık Aksiyonlar (WasPressedThisFrame semantiği) ────
 
         /// <summary>Zıplama tuşuna basıldı mı? (tek frame)</summary>
         bool GetJump();
 
-        /// <summary>Saldırı tuşuna basıldı mı? (tek frame)</summary>
-        bool GetAttack();
+        /// <summary>Yumruk tuşuna basıldı mı? (tek frame)</summary>
+        bool GetPunch();
+
+        /// <summary>Tekme tuşuna basıldı mı? (tek frame)</summary>
+        bool GetKick();
+
+        /// <summary>Ateş tuşuna basıldı mı? (tek frame)</summary>
+        bool GetShoot();
 
         /// <summary>Dash tuşuna basıldı mı? (tek frame)</summary>
         bool GetDash();
 
-        // ── Sürekli Basılı Aksiyonlar (IsPressed) ───────────────
+        // ── Sürekli Basılı Aksiyonlar (IsPressed semantiği) ─────
 
         /// <summary>Blok tuşu basılı mı? (sürekli)</summary>
         bool GetBlock();
@@ -58,13 +64,16 @@ namespace FightingGame.Core.Interfaces
         /// <summary>Çömelme tuşu basılı mı? (sürekli)</summary>
         bool GetCrouch();
 
-        // ── Skill Aksiyonları ───────────────────────────────────
+        // ── Özel Yetenek Aksiyonları ────────────────────────────
 
-        /// <summary>Q Skill tuşuna basıldı mı? (tek frame)</summary>
+        /// <summary>Skill 1 (Breaker) tuşuna basıldı mı? (tek frame)</summary>
         bool GetSkill1();
 
-        /// <summary>Ultimate tuşuna basıldı mı? (tek frame)</summary>
+        /// <summary>Skill 2 (Enhanced) tuşuna basıldı mı? (tek frame)</summary>
         bool GetSkill2();
+
+        /// <summary>Skill 3 (Ultimate) tuşuna basıldı mı? (tek frame)</summary>
+        bool GetSkill3();
 
         // ── Yaşam Döngüsü ──────────────────────────────────────
 
