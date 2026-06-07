@@ -218,6 +218,7 @@ namespace FightingGame.Character
         //  Rakip Yönetimi
         // ══════════════════════════════════════════════════════════
         public void SetOpponent(Transform opponentTransform) => opponent = opponentTransform;
+        public void SetEnemyLayer(LayerMask mask) => enemyLayer = mask;
 
         // ══════════════════════════════════════════════════════════
         //  Durum Makinesi

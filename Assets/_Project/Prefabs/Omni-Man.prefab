@@ -357,7 +357,7 @@ PrefabInstance:
     - target: {fileID: 5866666021909216657, guid: 5710ec68505c8c544b919b55a58053ad, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 6133e03478079cb419819ba37469e9fa, type: 2}
+      objectReference: {fileID: 9100000, guid: bf0ca40126c6d934b932dc6da3e5c26b, type: 2}
     - target: {fileID: 5866666021909216657, guid: 5710ec68505c8c544b919b55a58053ad, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0
@@ -420,9 +420,6 @@ PrefabInstance:
       addedObject: {fileID: 5372927527346073490}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5710ec68505c8c544b919b55a58053ad, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 922661947487897861}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5710ec68505c8c544b919b55a58053ad, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1984573804948175197}
   m_SourcePrefab: {fileID: 100100000, guid: 5710ec68505c8c544b919b55a58053ad, type: 3}
 --- !u!1 &1506455538730125473 stripped
@@ -471,7 +468,7 @@ MonoBehaviour:
   attackPoint: {fileID: 6606115627189726583}
   enemyLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 0
   opponent: {fileID: 0}
   groundCheck: {fileID: 6262025699593340876}
   groundCheckRadius: 0.2
@@ -487,18 +484,6 @@ MonoBehaviour:
   skill2Cooldown: 10
   skill1Damage: 35
   skill2Damage: 60
---- !u!114 &922661947487897861
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1506455538730125473}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 87a3c85b3ed1ad6479e9a16ea87dde53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FightingGame.Player.Player
 --- !u!114 &1984573804948175197
 MonoBehaviour:
   m_ObjectHideFlags: 0

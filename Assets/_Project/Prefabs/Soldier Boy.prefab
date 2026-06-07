@@ -1,0 +1,221 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &843357857040200252
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8574673335131505722}
+  m_Layer: 0
+  m_Name: GroundCheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8574673335131505722
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 843357857040200252}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1170803146030523020}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3312909202163866726
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3408873447468851952}
+  m_Layer: 0
+  m_Name: AttackPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3408873447468851952
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3312909202163866726}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.252, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1170803146030523020}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1708340075767678311
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.23459
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.37133
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -22.09
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_Name
+      value: Soldier Boy
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 796e723a8b8efa54eb69d7e0c2e32197, type: 2}
+    - target: {fileID: 5866666021909216657, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3408873447468851952}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8574673335131505722}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2555062252539922903}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4183667431540859380}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7177808497522190105}
+  m_SourcePrefab: {fileID: 100100000, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+--- !u!4 &1170803146030523020 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+  m_PrefabInstance: {fileID: 1708340075767678311}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1978302818448013366 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+  m_PrefabInstance: {fileID: 1708340075767678311}
+  m_PrefabAsset: {fileID: 0}
+--- !u!143 &2555062252539922903
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1978302818448013366}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4183667431540859380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1978302818448013366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a991c761bd02e544ca3b10846018d81e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FightingGame.Character.SoldierBoy
+  data: {fileID: 11400000, guid: 97d8fd6b3ac024a459266f1b532be64d, type: 2}
+  attackPoint: {fileID: 3408873447468851952}
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  opponent: {fileID: 0}
+  groundCheck: {fileID: 8574673335131505722}
+  groundCheckRadius: 0.2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  standingHeight: 2
+  crouchHeight: 1
+  crouchLerpSpeed: 12
+  useAnimationEventSync: 1
+  visualMesh: {fileID: 0}
+  skill1Cooldown: 3
+  skill2Cooldown: 10
+--- !u!114 &7177808497522190105
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1978302818448013366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87a3c85b3ed1ad6479e9a16ea87dde53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FightingGame.Player.Player

@@ -67,7 +67,7 @@ public class MenuManager : MonoBehaviour
 
     public void SelectMap1()
     {
-        GameManager.instance.selectedMap = "Mezarlı";
+        GameManager.instance.selectedMap = "Mezarlık";
 
         OpenCharacterSelection();
 
