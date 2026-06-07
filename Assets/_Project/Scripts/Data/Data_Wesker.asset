@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fb574560b1d25144aa0540ed25ef3474, type: 3}
-  m_Name: Omni-Man
+  m_Name: Data_Wesker
   m_EditorClassIdentifier: Assembly-CSharp::FightingGame.Core.Data.CharacterData
-  characterName: Unnamed
+  characterName: Wesker
   maxHealth: 100
   moveSpeed: 5
   jumpForce: 10

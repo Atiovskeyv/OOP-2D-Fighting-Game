@@ -1,5 +1,5 @@
 // ============================================================
-//  Homelander.cs
+//  Wesker.cs
 //  Namespace : FightingGame.Character
 //  Unity 2022.3 | URP | 2.5D Fighting Game Architecture
 // ============================================================
@@ -15,23 +15,24 @@ using UnityEngine;
 namespace FightingGame.Character
 {
     /// <summary>
-    /// Homelander — Lazer gözlü süper kahraman.
+    /// Wesker — Virüs güçlerine sahip hızlı ve ölümcül ajan.
     /// <para>
-    /// Skill1: Lazer Bakış — Uzun menzilli ışın saldırısı.
-    /// Skill2: Süper İniş (Ultimate) — Havadan süzülerek yere çakılma + AoE.
+    /// Skill1: Cobra Strike (Enhanced) — Hızlı bir ileri atılma ve avuç içi darbesi.
+    /// Skill2: Combo Breaker — Darbe alırken rakibi püskürtür.
+    /// Skill3: Phantom Move (Ultimate) — Çok yüksek hızda hareket ederek rakibin arkasından saldırı.
     /// </para>
     /// </summary>
-    public class Homelander : AbstractCharacter
+    public class Wesker : AbstractCharacter
     {
 
         /// <summary>
-        /// Lazer Bakış (Skill 1 - Enhanced) — Uzun menzilli ışın saldırısı.
+        /// Cobra Strike (Skill 1 - Enhanced) — Hızlı bir ileri atılma ve avuç içi darbesi.
         /// </summary>
         protected override void OnExecuteSkill1()
         {
-            // TODO: Raycast-based lazer saldırısı
-            // TODO: Özel animasyon + lazer VFX
-            Debug.Log("[Homelander] Lazer Bakış! (Enhanced Skill 1)");
+            // TODO: İleri atılma hareketi (Dash benzeri) + hasar
+            // TODO: Özel animasyon tetikleyicisi
+            Debug.Log("[Wesker] Cobra Strike! (Enhanced Skill 1)");
         }
 
         /// <summary>
@@ -39,30 +40,30 @@ namespace FightingGame.Character
         /// </summary>
         protected override void OnExecuteSkill2()
         {
-            Debug.Log("[Homelander] Süt Sağanağı! (Breaker Skill 2)");
+            Debug.Log("[Wesker] Virüs Savuşması! (Breaker Skill 2)");
         }
 
         /// <summary>
-        /// Süper İniş (Skill 3 - Ultimate) — Havadan süzülerek yere çakılma + AoE.
+        /// Phantom Move (Skill 3 - Ultimate) — Çok yüksek hızda hareket ederek rakibin arkasından saldırı.
         /// </summary>
         protected override void OnExecuteSkill3()
         {
-            // TODO: Fly up + slam down + shockwave AoE
-            // TODO: Özel animasyon + VFX + kamera sarsıntısı
-            Debug.Log("[Homelander] Süper İniş Ultimate! (Ultimate Skill 3)");
+            // TODO: Işınlanma/Göz kırpma efekti + yüksek hasar
+            // TODO: Özel animasyon + VFX
+            Debug.Log("[Wesker] Phantom Move Ultimate! (Ultimate Skill 3)");
         }
 
 #if UNITY_EDITOR
         protected override void OnStateChanged(CharacterState previous, CharacterState next)
         {
-            Debug.Log($"[Homelander] {previous} → {next}");
+            Debug.Log($"[Wesker] {previous} → {next}");
         }
 #endif
 
         protected override void OnDeath()
         {
             base.OnDeath();
-            // TODO: Homelander'a özel ölüm efekti
+            // TODO: Wesker'a özel ölüm efekti
         }
     }
 }
