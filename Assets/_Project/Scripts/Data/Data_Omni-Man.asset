@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Data_Omni-Man
   m_EditorClassIdentifier: Assembly-CSharp::FightingGame.Core.Data.CharacterData
   characterName: OmniMan
-  maxHealth: 100
+  maxHealth: 500
   moveSpeed: 5
   jumpForce: 10
   attackPower: 20
