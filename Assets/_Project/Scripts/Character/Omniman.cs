@@ -26,59 +26,42 @@ namespace FightingGame.Character
     /// </summary>
     public class Omniman : AbstractCharacter
     {
-        // ── Skill Cooldown'ları ──────────────────────────────────
-        [Header("Omniman Skills")]
-        [SerializeField] private float skill1Cooldown = 3f;
-        [SerializeField] private float skill2Cooldown = 10f;
-        [SerializeField] private float skill1Damage   = 35f;
-        [SerializeField] private float skill2Damage   = 60f;
 
-        private float _skill1Timer;
-        private float _skill2Timer;
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // Skill cooldown'larını tick et
-            if (_skill1Timer > 0f) _skill1Timer -= Time.deltaTime;
-            if (_skill2Timer > 0f) _skill2Timer -= Time.deltaTime;
-        }
 
         /// <summary>
-        /// Hız Darbesi — Süper hızla düşmana uçar, yakın mesafe hasar verir.
+        /// Hız Darbesi (Skill 1 - Enhanced) — Süper hızla düşmana uçar, yakın mesafe hasar verir.
         /// </summary>
-        public override void Skill1()
+        protected override void OnExecuteSkill1()
         {
-            if (!IsAlive) return;
-            if (_skill1Timer > 0f) return;
-
-            _skill1Timer = skill1Cooldown;
-
             // TODO: Dash-like movement toward opponent + damage
             // TODO: Özel animasyon trigger'ı
-            Debug.Log($"[Omniman] Hız Darbesi! (Skill1)");
+            Debug.Log($"[Omniman] Hız Darbesi! (Enhanced Skill 1)");
         }
 
         /// <summary>
-        /// Yere Çakma (Ultimate) — Havadan yere vurarak alan hasarı verir.
+        /// Combo Breaker (Skill 2 - Breaker) — Darbe alırken rakibi püskürtür.
         /// </summary>
-        public override void Skill2()
+        protected override void OnExecuteSkill2()
         {
-            if (!IsAlive) return;
-            if (_skill2Timer > 0f) return;
-
-            _skill2Timer = skill2Cooldown;
-
-            // TODO: Jump up + slam down + AoE damage
-            // TODO: Özel animasyon trigger'ı + VFX
-            Debug.Log($"[Omniman] Yere Çakma Ultimate! (Skill2)");
+            Debug.Log("[Omniman] Metro Savunması! (Breaker Skill 2)");
         }
 
+        /// <summary>
+        /// Yere Çakma (Skill 3 - Ultimate) — Havadan yere vurarak alan hasarı verir.
+        /// </summary>
+        protected override void OnExecuteSkill3()
+        {
+            // TODO: Jump up + slam down + AoE damage
+            // TODO: Özel animasyon trigger'ı + VFX
+            Debug.Log($"[Omniman] Yere Çakma Ultimate! (Ultimate Skill 3)");
+        }
+
+#if UNITY_EDITOR
         protected override void OnStateChanged(CharacterState previous, CharacterState next)
         {
             Debug.Log($"[Omniman] {previous} → {next}");
         }
+#endif
 
         protected override void OnDeath()
         {

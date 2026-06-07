@@ -1,7 +1,12 @@
 // ============================================================
 //  LaraCroft.cs
 //  Namespace : FightingGame.Character
-//  GEÇİCİ — Omniman'dan kopyalanmış placeholder script.
+//  Unity 2022.3 | URP | 2.5D Fighting Game Architecture
+// ============================================================
+//
+//  AbstractCharacter'dan türeyen somut karakter sınıfı.
+//  Bu script karakter prefab'ının üzerine eklenir.
+//
 // ============================================================
 
 using UnityEngine;
@@ -9,51 +14,53 @@ using UnityEngine;
 namespace FightingGame.Character
 {
     /// <summary>
-    /// Lara Croft — Geçici karakter sınıfı (test amaçlı).
+    /// Lara Croft — Çevik ve çok yönlü maceracı savaşçı.
+    /// <para>
+    /// Skill1: Çift Tabanca Saldırısı (Enhanced) — Hızlı ateş.
+    /// Skill2: Combo Breaker — Darbe alırken rakibi püskürtür.
+    /// Skill3: Dinamit Atışı (Ultimate) — Güçlü patlayıcı saldırı.
+    /// </para>
     /// </summary>
     public class LaraCroft : AbstractCharacter
     {
-        [Header("LaraCroft Skills")]
-        [SerializeField] private float skill1Cooldown = 3f;
-        [SerializeField] private float skill2Cooldown = 10f;
 
-        private float _skill1Timer;
-        private float _skill2Timer;
-
-        protected override void Update()
+        /// <summary>
+        /// Çift Tabanca Saldırısı (Skill 1 - Enhanced) — Hızlı ateş.
+        /// </summary>
+        protected override void OnExecuteSkill1()
         {
-            base.Update();
-
-            if (_skill1Timer > 0f) _skill1Timer -= Time.deltaTime;
-            if (_skill2Timer > 0f) _skill2Timer -= Time.deltaTime;
+            // TODO: Çift tabanca ateşi + özel animasyon
+            Debug.Log("[LaraCroft] Çift Tabanca Saldırısı! (Enhanced Skill 1)");
         }
 
-        public override void Skill1()
+        /// <summary>
+        /// Combo Breaker (Skill 2 - Breaker) — Darbe alırken rakibi püskürtür.
+        /// </summary>
+        protected override void OnExecuteSkill2()
         {
-            if (!IsAlive) return;
-            if (_skill1Timer > 0f) return;
-
-            _skill1Timer = skill1Cooldown;
-            Debug.Log("[LaraCroft] Skill1 (Placeholder)");
+            Debug.Log("[LaraCroft] Kaçış Manevras?! (Breaker Skill 2)");
         }
 
-        public override void Skill2()
+        /// <summary>
+        /// Dinamit Atışı (Skill 3 - Ultimate) — Güçlü patlayıcı saldırı.
+        /// </summary>
+        protected override void OnExecuteSkill3()
         {
-            if (!IsAlive) return;
-            if (_skill2Timer > 0f) return;
-
-            _skill2Timer = skill2Cooldown;
-            Debug.Log("[LaraCroft] Skill2 (Placeholder)");
+            // TODO: Dinamit fırlatma + AoE hasar + VFX
+            Debug.Log("[LaraCroft] Dinamit Atışı! (Ultimate Skill 3)");
         }
 
+#if UNITY_EDITOR
         protected override void OnStateChanged(CharacterState previous, CharacterState next)
         {
             Debug.Log($"[LaraCroft] {previous} → {next}");
         }
+#endif
 
         protected override void OnDeath()
         {
             base.OnDeath();
+            // TODO: LaraCroft'a özel ölüm efekti
         }
     }
 }
