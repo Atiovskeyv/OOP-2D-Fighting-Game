@@ -189,11 +189,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c0dccb47b8324b40a4e988b17dbfe92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FightingGame.Character.Wesker
-  data: {fileID: 0}
+  data: {fileID: 11400000, guid: 6a4652dd83157b748873aad4a78f45e6, type: 2}
   attackPoint: {fileID: 7606588975944310042}
   enemyLayer:
     serializedVersion: 2
     m_Bits: 0
+  shootPoint: {fileID: 0}
   opponent: {fileID: 0}
   groundCheck: {fileID: 7840342598474647107}
   groundCheckRadius: 0.2
@@ -205,8 +206,7 @@ MonoBehaviour:
   crouchLerpSpeed: 12
   useAnimationEventSync: 1
   visualMesh: {fileID: 0}
-  skill1Cooldown: 4
-  skill2Cooldown: 12
+  _comboWindow: 0.5
 --- !u!114 &4047454212294533772
 MonoBehaviour:
   m_ObjectHideFlags: 0

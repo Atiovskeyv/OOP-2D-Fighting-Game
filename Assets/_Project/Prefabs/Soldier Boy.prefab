@@ -180,7 +180,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1095b80bd39725468e8d309d59a2f5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FightingGame.Character.SoldierBoy
-  data: {fileID: 0}
+  data: {fileID: 11400000, guid: 0632499d33bf05a4b83379db5d8bcacd, type: 2}
   attackPoint: {fileID: 4126067813642088217}
   enemyLayer:
     serializedVersion: 2

@@ -95,6 +95,7 @@ namespace FightingGame.Character
         // ── Bileşen Referansları ────────────────────────────────
         private CharacterController _cc;
         protected Animator          _animator;
+        private int                 _rightSideLayerIndex = -1;
 
         // ── Fizik ───────────────────────────────────────────────
         private Vector3 _velocity;
@@ -193,6 +194,11 @@ namespace FightingGame.Character
 
             InitializeAnimatorParameters();
             InitializeCombos();
+
+            if (_animator != null)
+            {
+                _rightSideLayerIndex = _animator.GetLayerIndex("Right Side Layer");
+            }
         }
 
         protected virtual void Update()
@@ -208,6 +214,7 @@ namespace FightingGame.Character
             ProcessBlock();
             ApplyMovement();
             UpdateFacing();
+            UpdateAnimatorSideLayer();
             UpdateAnimatorLocomotion();
         }
 
@@ -648,6 +655,13 @@ namespace FightingGame.Character
             if (!_hasSpeedParam) return;
             Vector3 hVel = new Vector3(_cc.velocity.x, 0, _cc.velocity.z);
             _animator.SetFloat(AnimParam.Speed, hVel.magnitude);
+        }
+
+        private void UpdateAnimatorSideLayer()
+        {
+            if (_animator == null || opponent == null || _rightSideLayerIndex == -1) return;
+            bool isLeftSide = transform.position.x < opponent.position.x;
+            _animator.SetLayerWeight(_rightSideLayerIndex, isLeftSide ? 0f : 1f);
         }
 
         // ══════════════════════════════════════════════════════════
