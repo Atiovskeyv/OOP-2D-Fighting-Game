@@ -1,5 +1,5 @@
 // ============================================================
-//  Wesker.cs
+//  Homelander.cs
 //  Namespace : FightingGame.Character
 //  Unity 2022.3 | URP | 2.5D Fighting Game Architecture
 // ============================================================
@@ -15,69 +15,54 @@ using UnityEngine;
 namespace FightingGame.Character
 {
     /// <summary>
-    /// Wesker — Virüs güçlerine sahip hızlı ve ölümcül ajan.
+    /// Homelander — Lazer gözlü süper kahraman.
     /// <para>
-    /// Skill1: Cobra Strike — Hızlı bir ileri atılma ve avuç içi darbesi.
-    /// Skill2: Phantom Move (Ultimate) — Çok yüksek hızda hareket ederek rakibin arkasından saldırı.
+    /// Skill1: Lazer Bakış — Uzun menzilli ışın saldırısı.
+    /// Skill2: Süper İniş (Ultimate) — Havadan süzülerek yere çakılma + AoE.
     /// </para>
     /// </summary>
-    public class Wesker : AbstractCharacter
+    public class Homelander : AbstractCharacter
     {
-        [Header("Wesker Skills")]
-        [SerializeField] private float skill1Cooldown = 4f;
-        [SerializeField] private float skill2Cooldown = 12f;
 
-        private float _skill1Timer;
-        private float _skill2Timer;
-
-        protected override void Update()
+        /// <summary>
+        /// Lazer Bakış (Skill 1 - Enhanced) — Uzun menzilli ışın saldırısı.
+        /// </summary>
+        protected override void OnExecuteSkill1()
         {
-            base.Update();
-
-            // Skill cooldown'larını düşür
-            if (_skill1Timer > 0f) _skill1Timer -= Time.deltaTime;
-            if (_skill2Timer > 0f) _skill2Timer -= Time.deltaTime;
+            // TODO: Raycast-based lazer saldırısı
+            // TODO: Özel animasyon + lazer VFX
+            Debug.Log("[Homelander] Lazer Bakış! (Enhanced Skill 1)");
         }
 
         /// <summary>
-        /// Cobra Strike — Hızlı bir ileri atılma ve avuç içi darbesi.
+        /// Combo Breaker (Skill 2 - Breaker) — Darbe alırken rakibi püskürtür.
         /// </summary>
-        public override void Skill1()
+        protected override void OnExecuteSkill2()
         {
-            if (!IsAlive) return;
-            if (_skill1Timer > 0f) return;
-
-            _skill1Timer = skill1Cooldown;
-
-            // TODO: İleri atılma hareketi (Dash benzeri) + hasar
-            // TODO: Özel animasyon tetikleyicisi
-            Debug.Log("[Wesker] Cobra Strike! (Skill1)");
+            Debug.Log("[Homelander] Süt Sağanağı! (Breaker Skill 2)");
         }
 
         /// <summary>
-        /// Phantom Move (Ultimate) — Çok yüksek hızda hareket ederek rakibin arkasından saldırı.
+        /// Süper İniş (Skill 3 - Ultimate) — Havadan süzülerek yere çakılma + AoE.
         /// </summary>
-        public override void Skill2()
+        protected override void OnExecuteSkill3()
         {
-            if (!IsAlive) return;
-            if (_skill2Timer > 0f) return;
-
-            _skill2Timer = skill2Cooldown;
-
-            // TODO: Işınlanma/Göz kırpma efekti + yüksek hasar
-            // TODO: Özel animasyon + VFX
-            Debug.Log("[Wesker] Phantom Move Ultimate! (Skill2)");
+            // TODO: Fly up + slam down + shockwave AoE
+            // TODO: Özel animasyon + VFX + kamera sarsıntısı
+            Debug.Log("[Homelander] Süper İniş Ultimate! (Ultimate Skill 3)");
         }
 
+#if UNITY_EDITOR
         protected override void OnStateChanged(CharacterState previous, CharacterState next)
         {
-            Debug.Log($"[Wesker] {previous} → {next}");
+            Debug.Log($"[Homelander] {previous} → {next}");
         }
+#endif
 
         protected override void OnDeath()
         {
             base.OnDeath();
-            // TODO: Wesker'a özel ölüm efekti
+            // TODO: Homelander'a özel ölüm efekti
         }
     }
 }
