@@ -23,55 +23,41 @@ namespace FightingGame.Character
     /// </summary>
     public class Homelander : AbstractCharacter
     {
-        [Header("Homelander Skills")]
-        [SerializeField] private float skill1Cooldown = 3.5f;
-        [SerializeField] private float skill2Cooldown = 15f;
-
-        private float _skill1Timer;
-        private float _skill2Timer;
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (_skill1Timer > 0f) _skill1Timer -= Time.deltaTime;
-            if (_skill2Timer > 0f) _skill2Timer -= Time.deltaTime;
-        }
 
         /// <summary>
-        /// Lazer Bakış — Uzun menzilli ışın saldırısı.
+        /// Lazer Bakış (Skill 1 - Enhanced) — Uzun menzilli ışın saldırısı.
         /// </summary>
-        public override void Skill1()
+        protected override void OnExecuteSkill1()
         {
-            if (!IsAlive) return;
-            if (_skill1Timer > 0f) return;
-
-            _skill1Timer = skill1Cooldown;
-
             // TODO: Raycast-based lazer saldırısı
             // TODO: Özel animasyon + lazer VFX
-            Debug.Log("[Homelander] Lazer Bakış! (Skill1)");
+            Debug.Log("[Homelander] Lazer Bakış! (Enhanced Skill 1)");
         }
 
         /// <summary>
-        /// Süper İniş (Ultimate) — Havadan süzülerek yere çakılma + AoE.
+        /// Combo Breaker (Skill 2 - Breaker) — Darbe alırken rakibi püskürtür.
         /// </summary>
-        public override void Skill2()
+        protected override void OnExecuteSkill2()
         {
-            if (!IsAlive) return;
-            if (_skill2Timer > 0f) return;
-
-            _skill2Timer = skill2Cooldown;
-
-            // TODO: Fly up + slam down + shockwave AoE
-            // TODO: Özel animasyon + VFX + kamera sarsıntısı
-            Debug.Log("[Homelander] Süper İniş Ultimate! (Skill2)");
+            Debug.Log("[Homelander] Süt Sağanağı! (Breaker Skill 2)");
         }
 
+        /// <summary>
+        /// Süper İniş (Skill 3 - Ultimate) — Havadan süzülerek yere çakılma + AoE.
+        /// </summary>
+        protected override void OnExecuteSkill3()
+        {
+            // TODO: Fly up + slam down + shockwave AoE
+            // TODO: Özel animasyon + VFX + kamera sarsıntısı
+            Debug.Log("[Homelander] Süper İniş Ultimate! (Ultimate Skill 3)");
+        }
+
+#if UNITY_EDITOR
         protected override void OnStateChanged(CharacterState previous, CharacterState next)
         {
             Debug.Log($"[Homelander] {previous} → {next}");
         }
+#endif
 
         protected override void OnDeath()
         {

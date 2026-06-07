@@ -54,29 +54,42 @@ namespace FightingGame.Match
         private void InitializePlayers()
         {
             // Player 1 — WASD binding + prefab'daki karakter (Omniman/Guts/vs.)
-            ICharacter character1 = player1.GetComponent<ICharacter>();
-            if (character1 == null)
+            if (player1 != null)
             {
-                Debug.LogError("[MatchManager] Player 1 üzerinde ICharacter bulunamadı!", player1);
-                return;
+                ICharacter character1 = player1.GetComponentInChildren<ICharacter>();
+                if (character1 != null)
+                {
+                    player1.Initialize(new KeyboardBindingWasd(), character1);
+                }
+                else
+                {
+                    Debug.LogError("[MatchManager] Player 1 üzerinde ICharacter bulunamadı!", player1);
+                }
             }
-            player1.Initialize(new KeyboardBindingWasd(), character1);
 
             // Player 2 — Arrow binding + prefab'daki karakter
-            ICharacter character2 = player2.GetComponent<ICharacter>();
-            if (character2 == null)
+            if (player2 != null)
             {
-                Debug.LogError("[MatchManager] Player 2 üzerinde ICharacter bulunamadı!", player2);
-                return;
+                ICharacter character2 = player2.GetComponentInChildren<ICharacter>();
+                if (character2 != null)
+                {
+                    player2.Initialize(new KeyboardBindingArrows(), character2);
+                }
+                else
+                {
+                    Debug.LogError("[MatchManager] Player 2 üzerinde ICharacter bulunamadı!", player2);
+                }
             }
-            player2.Initialize(new KeyboardBindingArrows(), character2);
         }
 
         private void SetOpponents()
         {
             // Rakipleri birbirine tanıt
-            player1.SetOpponent(player2.transform);
-            player2.SetOpponent(player1.transform);
+            if (player1 != null && player2 != null)
+            {
+                player1.SetOpponent(player2.transform);
+                player2.SetOpponent(player1.transform);
+            }
         }
     }
 }
