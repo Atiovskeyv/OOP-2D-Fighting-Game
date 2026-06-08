@@ -10,9 +10,9 @@ using FightingGame.Character;
 namespace FightingGame.Core
 {
     /// <summary>
-    /// 2.5D Dövüş oyunu kamera sistemi. 
-    /// İki karakteri ortalar, mesafeye göre yaklaşır/uzaklaşır (Z ekseninde zoom yapar)
-    /// ve harita sınırlarına göre kendini kısıtlar.
+    /// 2.5D Dövüş oyunu kamera sistemi.
+    /// İki karakteri merkeze alır, mesafeye göre FOV-tabanlı çerçeveleme yapar.
+    /// Yakın dövüşte sabit zoom, uzakta ise oyuncuları ekran kenarlarına hizalar.
     /// </summary>
     [RequireComponent(typeof(UnityEngine.Camera))]
     public class CameraFollow : MonoBehaviour
@@ -23,18 +23,28 @@ namespace FightingGame.Core
         [SerializeField] private Transform player2;
 
         [Header("Movement Tuning")]
-        [Tooltip("Kameranın karakterleri takip etme yumuşaklığı (Düşük değer = daha hızlı takip).")]
+        [Tooltip("Kameranın karakterleri takip etme yumuşaklığı (Düşük = daha hızlı).")]
         [SerializeField] private float smoothTime = 0.15f;
-        [Tooltip("Oyuncu merkez noktasına göre kameranın sahip olacağı sabit yükseklik ve başlangıç derinlik ofseti.")]
-        [SerializeField] private Vector3 offset = new Vector3(0f, 1.8f, -5.5f);
+        [Tooltip("Merkez noktasına göre kamera ofseti (X: yatay, Y: dikey). Z kullanılmaz, zoom otomatik hesaplanır.")]
+        [SerializeField] private Vector2 offset = new Vector2(0f, 1.5f);
 
-        [Header("Zoom (Z Depth) Settings")]
-        [Tooltip("Kameranın karakterlere yaklaşabileceği en yakın mesafe (Z derinliği).")]
-        [SerializeField] private float minDistanceZ = 4f;
-        [Tooltip("Kameranın karakterlerden uzaklaşabileceği en uzak mesafe (Z derinliği).")]
-        [SerializeField] private float maxDistanceZ = 10f;
-        [Tooltip("Karakterler arasındaki mesafenin kameranın derinliğine (Zoom) olan etki çarpanı.")]
-        [SerializeField] private float zoomMultiplier = 0.4f;
+        [Header("Framing (Çerçeveleme)")]
+        [Tooltip("Ekran kenar boşluğu oranı (0-1). Oyuncular ekranın ne kadar içinde kalacak. 0.12 = her kenardan %12 boşluk.")]
+        [SerializeField][Range(0.05f, 0.4f)] private float screenEdgePadding = 0.12f;
+
+        [Header("Close Combat (Yakın Dövüş)")]
+        [Tooltip("Kameranın oyunculara yaklaşabileceği minimum Z mesafesi. Oyuncular çok yakınlaşınca aşırı zoom-in'i önler.")]
+        [SerializeField] private float closeCombatDistance = 3.5f;
+
+        [Header("Zoom Limits")]
+        [Tooltip("Kameranın oyunculara olabileceği en yakın Z mesafesi.")]
+        [SerializeField] private float minZoomDistance = 4f;
+        [Tooltip("Kameranın oyunculardan olabileceği en uzak Z mesafesi.")]
+        [SerializeField] private float maxZoomDistance = 12f;
+
+        [Header("Height Tuning")]
+        [Tooltip("Kamera uzaklaştıkça (zoom out) kazanacağı ekstra yükseklik çarpanı. Dövüş açısını korur.")]
+        [SerializeField] private float heightMultiplier = 0.1f;
 
         [Header("Camera Bounds (Harita Sınırları)")]
         [SerializeField] private float minX = -15f;
@@ -42,99 +52,93 @@ namespace FightingGame.Core
         [SerializeField] private float minY = 0.5f;
         [SerializeField] private float maxY = 8f;
 
-        // Dahili fizik değişkenleri
+        // Dahili değişkenler
         private Vector3 _smoothVelocity;
-        private bool _isInitialized;
         private UnityEngine.Camera _cam;
         private float _orthoZoomVelocity;
-
-        private void Awake()
-        {
-            // Değerleri daha da yakın olacak şekilde güncelliyoruz (Yükseklik 2.0f'e çıkarıldı)
-            offset = new Vector3(0f, 2.0f, -3.2f);
-            minDistanceZ = 2.2f;
-            maxDistanceZ = 12.0f; // Limit artırıldı (6.0f -> 12.0f)
-            zoomMultiplier = 0.4f; // Oyuncular açıldıkça daha hızlı uzaklaşması için çarpan artırıldı (0.25f -> 0.4f)
-        }
 
         private void Start()
         {
             _cam = GetComponent<UnityEngine.Camera>();
             FindPlayers();
-            ConfigureBoundsForCurrentScene();
-        }
-
-        private void ConfigureBoundsForCurrentScene()
-        {
-            string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-            
-            // Sahne ismine göre harita sınırlarını (kamera kelepçelerini) otomatik ayarlıyoruz
-            if (sceneName == "Mezarlık" || sceneName == "Mezarlik" || sceneName == "SampleScene")
-            {
-                minX = -15f;
-                maxX = 15f;
-                minY = 0.5f;
-                maxY = 8f;
-            }
-            else if (sceneName == "MoodyNight" || sceneName == "Büyülü Orman")
-            {
-                // Büyülü Orman (MoodyNight) haritasında oyuncular x=50 civarında spawn olmaktadır.
-                minX = 35f;
-                maxX = 70f;
-                minY = 0.5f;
-                maxY = 10f;
-            }
         }
 
         private void LateUpdate()
         {
-            // Eğer oyuncular henüz atanmadıysa veya sahneden silindiyse tekrar bulmayı dene
             if (player1 == null || player2 == null)
             {
                 FindPlayers();
                 if (player1 == null || player2 == null) return;
             }
 
-            // 1. İki oyuncunun merkez noktasını bul
-            Vector3 centerPoint = GetCenterPoint();
+            // 1. İki oyuncunun merkez noktası
+            Vector3 centerPoint = (player1.position + player2.position) * 0.5f;
 
-            // 2. Oyuncular arasındaki yatay mesafeyi hesapla
+            // 2. Oyuncular arasındaki yatay mesafe
             float playerDistance = Mathf.Abs(player1.position.x - player2.position.x);
 
-            // 3. Hedef X ve Y pozisyonlarını hesapla ve sınırlar içinde sınırla (Clamp)
+            // 3. Hedef Z mesafesini hesapla
+            float targetDepth = CalculateTargetDepth(playerDistance);
+
+            // 4. Hedef pozisyonu oluştur
+            float extraHeight = (targetDepth - minZoomDistance) * heightMultiplier;
             float targetX = Mathf.Clamp(centerPoint.x + offset.x, minX, maxX);
-            float targetY = Mathf.Clamp(centerPoint.y + offset.y, minY, maxY);
-
-            // 4. Oyuncuların mesafesine göre dinamik derinlik (Z ekseninde zoom) hesapla
-            // offset.z negatif olduğu için (-12f gibi), mesafeyi çıkartarak daha da geriye gitmesini sağlıyoruz.
-            float targetDepth = offset.z - (playerDistance * zoomMultiplier);
-            targetDepth = Mathf.Clamp(-targetDepth, minDistanceZ, maxDistanceZ); // Derinliği sınırlar içinde tut
-
-            // Oyuncuların ortalama Z pozisyonunu temel alarak hedef Z'yi ata (Map fark etmeksizin çalışması için)
+            float targetY = Mathf.Clamp(centerPoint.y + offset.y + extraHeight, minY, maxY);
             float targetZ = centerPoint.z - targetDepth;
 
-            // 5. Hedef pozisyonu birleştir ve SmoothDamp ile kamerayı yumuşakça hareket ettir
             Vector3 targetPosition = new Vector3(targetX, targetY, targetZ);
-            transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref _smoothVelocity, smoothTime);
 
-            // 6. Eğer kamera Orthographic (Ortografik) ise, sadece konumu değiştirmek yakınlaştırmaz.
-            // Bu yüzden Size değerini oyuncuların mesafesine göre dinamik olarak değiştiriyoruz.
-            if (_cam != null && _cam.orthographic)
+            // 5. SmoothDamp ile yumuşak takip
+            transform.position = Vector3.SmoothDamp(
+                transform.position, targetPosition, ref _smoothVelocity, smoothTime);
+
+            // 6. Ortografik kamera desteği (opsiyonel)
+            if (_cam.orthographic)
             {
-                // Uzaklaştıkça daha fazla genişlemesi için katsayıyı 0.35'e, limiti de 6.5'e çıkardım
-                float targetOrthoSize = 1.6f + (playerDistance * 0.35f);
-                targetOrthoSize = Mathf.Clamp(targetOrthoSize, 1.4f, 6.5f);
-                _cam.orthographicSize = Mathf.SmoothDamp(_cam.orthographicSize, targetOrthoSize, ref _orthoZoomVelocity, smoothTime);
+                UpdateOrthographicZoom(playerDistance);
             }
         }
 
         /// <summary>
-        /// İki oyuncunun dünya alanındaki merkez pozisyonunu döndürür.
+        /// Perspective kamera için FOV ve aspect ratio'ya göre her iki oyuncuyu
+        /// ekrana sığdıracak Z mesafesini hesaplar.
+        /// closeCombatDistance bir taban sınır görevi görür: kamera bundan daha yakına gidemez.
         /// </summary>
-        private Vector3 GetCenterPoint()
+        private float CalculateTargetDepth(float playerDistance)
         {
-            if (player1 == null || player2 == null) return Vector3.zero;
-            return (player1.position + player2.position) / 2f;
+            // Horizontal FOV = 2 * atan(tan(vFOV/2) * aspect)
+            float vFovRad = _cam.fieldOfView * Mathf.Deg2Rad * 0.5f;
+            float hFovRad = Mathf.Atan(Mathf.Tan(vFovRad) * _cam.aspect);
+
+            // Ekranın kullanılabilir genişliği (padding çıkarılmış)
+            float usableFraction = 1f - 2f * screenEdgePadding;
+            float requiredWidth = playerDistance / Mathf.Max(usableFraction, 0.1f);
+
+            // Bu genişliği görebilmek için gereken Z mesafesi
+            float framingDepth = requiredWidth / (2f * Mathf.Tan(hFovRad));
+
+            // Taban sınır: oyuncular çok yakınlaşınca framingDepth çok küçülür,
+            // closeCombatDistance ile aşırı zoom-in'i engelle
+            float targetDepth = Mathf.Max(framingDepth, closeCombatDistance);
+
+            return Mathf.Clamp(targetDepth, minZoomDistance, maxZoomDistance);
+        }
+
+        /// <summary>
+        /// Ortografik kamera için orthographicSize'ı dinamik olarak ayarlar.
+        /// </summary>
+        private void UpdateOrthographicZoom(float playerDistance)
+        {
+            float minOrthoSize = 2.5f;
+            float usableFraction = 1f - 2f * screenEdgePadding;
+            float framingOrthoSize = (playerDistance / usableFraction) / (2f * _cam.aspect);
+
+            // Taban sınır: aşırı zoom-in'i engelle
+            float targetSize = Mathf.Max(framingOrthoSize, minOrthoSize);
+            targetSize = Mathf.Clamp(targetSize, 2f, 6f);
+
+            _cam.orthographicSize = Mathf.SmoothDamp(
+                _cam.orthographicSize, targetSize, ref _orthoZoomVelocity, smoothTime);
         }
 
         /// <summary>
