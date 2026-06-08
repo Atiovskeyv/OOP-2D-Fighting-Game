@@ -23754,6 +23754,7 @@ MonoBehaviour:
   crouchLerpSpeed: 12
   useAnimationEventSync: 0
   visualMesh: {fileID: 1600991438}
+  locomotionBlendSpeed: 15
   _comboWindow: 0.5
   berserkerDuration: 5
 --- !u!114 &858997169
@@ -24448,6 +24449,7 @@ MonoBehaviour:
   crouchLerpSpeed: 12
   useAnimationEventSync: 0
   visualMesh: {fileID: 2027063417}
+  locomotionBlendSpeed: 15
   _comboWindow: 0.5
   bulletPrefab: {fileID: 3032059870984294207, guid: aba279fbdde6e6042963b6967ba5fb7e, type: 3}
   grenadePrefab: {fileID: 6719933053645606521, guid: e991f92d30fc0404982c97e609549b31, type: 3}
@@ -24502,8 +24504,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 889843959}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 3.000056, y: 0.27900004, z: -21.99991}
+  m_LocalRotation: {x: -0, y: 0.6417606, z: -0, w: 0.7669051}
+  m_LocalPosition: {x: 2.9970486, y: 0.17, z: -22.005377}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -24512,7 +24514,7 @@ Transform:
   - {fileID: 1922058671}
   - {fileID: 2027063417}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 79.846, z: 0}
 --- !u!4 &889921354 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: ee310940381d5f3409a44456d948e8e3, type: 3}
@@ -52910,8 +52912,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1984239434}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.042261, y: -0.013646037, z: 0.00057752925, w: 0.99901325}
-  m_LocalPosition: {x: 0.99, y: 2.53, z: -27.79}
+  m_LocalRotation: {x: 0.024273597, y: -0.007656322, z: 0.00018633346, w: 0.999676}
+  m_LocalPosition: {x: 3.1194649, y: 1.7042668, z: -26.537422}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -54579,7 +54581,7 @@ Animator:
   m_GameObject: {fileID: 2027063416}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 16e0c2abe2e84744e9eb39f5742dc628, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

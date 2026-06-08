@@ -44,6 +44,10 @@ namespace FightingGame.Character
         public static readonly int IsHit         = Animator.StringToHash("isHit");
         public static readonly int IsDead        = Animator.StringToHash("isDead");
         public static readonly int AttackTrigger = Animator.StringToHash("AttackTrigger");
+        
+        // YENİ EKLENENLER:
+        public static readonly int VerticalVelocity = Animator.StringToHash("VerticalVelocity");
+        public static readonly int IsJuggled        = Animator.StringToHash("isJuggled");
     }
 
     [RequireComponent(typeof(CharacterController))]
@@ -79,6 +83,11 @@ namespace FightingGame.Character
 
         [Header("Visual Settings")]
         [SerializeField] protected Transform visualMesh;
+        [Tooltip("Animator geçişlerindeki (Idle/Walk vb.) yumuşatma hızı. (Büyük değer = Daha hızlı ve keskin geçiş)")]
+        [SerializeField] private float locomotionBlendSpeed = 15f;
+        
+        // Linear animasyon geçişi için anlık hızı tutar
+        private float _currentAnimSpeed;
 
         // ── IDamageable ─────────────────────────────────────────
         private int _currentHealth;
@@ -119,6 +128,8 @@ namespace FightingGame.Character
         private bool _hasIsHitParam;
         private bool _hasIsDeadParam;
         private bool _hasAttackTriggerParam;
+        private bool _hasVerticalVelocityParam;
+        private bool _hasIsJuggledParam;
 
         // ── Dövüş ve Kombo Sistemi ──────────────────────────────
         public enum AttackInputType { Punch, Kick, Shoot }
@@ -385,6 +396,8 @@ namespace FightingGame.Character
                 else if (param.nameHash == AnimParam.IsHit) _hasIsHitParam = true;
                 else if (param.nameHash == AnimParam.IsDead) _hasIsDeadParam = true;
                 else if (param.nameHash == AnimParam.AttackTrigger) _hasAttackTriggerParam = true;
+                else if (param.nameHash == AnimParam.VerticalVelocity) _hasVerticalVelocityParam = true;
+                else if (param.nameHash == AnimParam.IsJuggled) _hasIsJuggledParam = true;
             }
         }
 
@@ -639,14 +652,37 @@ namespace FightingGame.Character
             else if (_hasIsBlockingParam  && HasState(CharacterState.Block))  _animator.SetBool(AnimParam.IsBlocking,  true);
             else if (_hasIsHitParam       && HasState(CharacterState.Hit))    _animator.SetBool(AnimParam.IsHit,       true);
             else if (_hasIsDeadParam      && HasState(CharacterState.Dead))   _animator.SetBool(AnimParam.IsDead,      true);
+
+            // Fırlatılma durumunu ilet
+            if (_hasIsJuggledParam) _animator.SetBool(AnimParam.IsJuggled, _isJuggled);
         }
 
         private void UpdateAnimatorLocomotion()
         {
             if (_animator == null || _animator.runtimeAnimatorController == null) return;
-            if (!_hasSpeedParam) return;
-            Vector3 hVel = new Vector3(_cc.velocity.x, 0, _cc.velocity.z);
-            _animator.SetFloat(AnimParam.Speed, hVel.magnitude);
+            
+            if (_hasSpeedParam)
+            {
+                Vector3 hVel = new Vector3(_cc.velocity.x, 0, _cc.velocity.z);
+                // Karakterin baktığı yön ile gittiği yön aynıysa ileri (+1), zıtsa geri (-1) yürüyor demektir.
+                float speedDir = Mathf.Sign(hVel.x) == GetFacingSign() ? 1f : -1f;
+                if (hVel.magnitude < 0.01f) speedDir = 1f; // Dururken sapıtmaması için
+
+                // Hızı karakterin maksimum hızıyla normalize ederek -1 ile 1 arasına getiriyoruz.
+                float targetSpeed = data.moveSpeed > 0f ? (hVel.magnitude / data.moveSpeed) * speedDir : speedDir;
+                targetSpeed = Mathf.Clamp(targetSpeed, -1f, 1f); // Hız buff'ı alması durumunda Blend Tree dışına çıkmasını önler
+                
+                // Doğrusal (Linear) geçiş kullanarak, sönümlemedeki o "dalgalanma" hissini kaldırıyoruz.
+                _currentAnimSpeed = Mathf.MoveTowards(_currentAnimSpeed, targetSpeed, locomotionBlendSpeed * Time.deltaTime);
+                
+                _animator.SetFloat(AnimParam.Speed, _currentAnimSpeed);
+            }
+
+            if (_hasVerticalVelocityParam)
+            {
+                // Y eksenindeki ivmeyi doğrudan Animatör'e ver (+ ise zıplıyor, - ise düşüyor)
+                _animator.SetFloat(AnimParam.VerticalVelocity, _cc.velocity.y);
+            }
         }
 
         // ══════════════════════════════════════════════════════════
