@@ -79,6 +79,10 @@ namespace FightingGame.Core.Data
         [Min(0f)]
         public float hitStunDuration = 0.4f;
 
+        [Tooltip("Alınan hasarın Özel Bar'ı (Special Meter) ne orande dolduracağı katsayı.")]
+        [Min(0f)]
+        public float specialMeterFillMultiplier = 1.5f;
+
         // ── Skill Data (YENİ) ───────────────────────────────────
 
         [Header("Skill 1 (Q Skill)")]

@@ -17,62 +17,48 @@ namespace FightingGame.Character
     /// <summary>
     /// Wesker — Virüs güçlerine sahip hızlı ve ölümcül ajan.
     /// <para>
-    /// Skill1: Cobra Strike — Hızlı bir ileri atılma ve avuç içi darbesi.
-    /// Skill2: Phantom Move (Ultimate) — Çok yüksek hızda hareket ederek rakibin arkasından saldırı.
+    /// Skill1: Cobra Strike (Enhanced) — Hızlı bir ileri atılma ve avuç içi darbesi.
+    /// Skill2: Combo Breaker — Darbe alırken rakibi püskürtür.
+    /// Skill3: Phantom Move (Ultimate) — Çok yüksek hızda hareket ederek rakibin arkasından saldırı.
     /// </para>
     /// </summary>
     public class Wesker : AbstractCharacter
     {
-        [Header("Wesker Skills")]
-        [SerializeField] private float skill1Cooldown = 4f;
-        [SerializeField] private float skill2Cooldown = 12f;
-
-        private float _skill1Timer;
-        private float _skill2Timer;
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // Skill cooldown'larını düşür
-            if (_skill1Timer > 0f) _skill1Timer -= Time.deltaTime;
-            if (_skill2Timer > 0f) _skill2Timer -= Time.deltaTime;
-        }
 
         /// <summary>
-        /// Cobra Strike — Hızlı bir ileri atılma ve avuç içi darbesi.
+        /// Cobra Strike (Skill 1 - Enhanced) — Hızlı bir ileri atılma ve avuç içi darbesi.
         /// </summary>
-        public override void Skill1()
+        protected override void OnExecuteSkill1()
         {
-            if (!IsAlive) return;
-            if (_skill1Timer > 0f) return;
-
-            _skill1Timer = skill1Cooldown;
-
             // TODO: İleri atılma hareketi (Dash benzeri) + hasar
             // TODO: Özel animasyon tetikleyicisi
-            Debug.Log("[Wesker] Cobra Strike! (Skill1)");
+            Debug.Log("[Wesker] Cobra Strike! (Enhanced Skill 1)");
         }
 
         /// <summary>
-        /// Phantom Move (Ultimate) — Çok yüksek hızda hareket ederek rakibin arkasından saldırı.
+        /// Combo Breaker (Skill 2 - Breaker) — Darbe alırken rakibi püskürtür.
         /// </summary>
-        public override void Skill2()
+        protected override void OnExecuteSkill2()
         {
-            if (!IsAlive) return;
-            if (_skill2Timer > 0f) return;
-
-            _skill2Timer = skill2Cooldown;
-
-            // TODO: Işınlanma/Göz kırpma efekti + yüksek hasar
-            // TODO: Özel animasyon + VFX
-            Debug.Log("[Wesker] Phantom Move Ultimate! (Skill2)");
+            Debug.Log("[Wesker] Virüs Savuşması! (Breaker Skill 2)");
         }
 
+        /// <summary>
+        /// Phantom Move (Skill 3 - Ultimate) — Çok yüksek hızda hareket ederek rakibin arkasından saldırı.
+        /// </summary>
+        protected override void OnExecuteSkill3()
+        {
+            // TODO: Işınlanma/Göz kırpma efekti + yüksek hasar
+            // TODO: Özel animasyon + VFX
+            Debug.Log("[Wesker] Phantom Move Ultimate! (Ultimate Skill 3)");
+        }
+
+#if UNITY_EDITOR
         protected override void OnStateChanged(CharacterState previous, CharacterState next)
         {
             Debug.Log($"[Wesker] {previous} → {next}");
         }
+#endif
 
         protected override void OnDeath()
         {
