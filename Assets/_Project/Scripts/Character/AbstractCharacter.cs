@@ -654,7 +654,21 @@ namespace FightingGame.Character
             if (_animator == null || _animator.runtimeAnimatorController == null) return;
             if (!_hasSpeedParam) return;
             Vector3 hVel = new Vector3(_cc.velocity.x, 0, _cc.velocity.z);
-            _animator.SetFloat(AnimParam.Speed, hVel.magnitude);
+            float speedVal = hVel.magnitude;
+
+            if (speedVal > 0.05f)
+            {
+                float facingSign = GetFacingSign(); // Sağa bakıyorsa 1f, sola bakıyorsa -1f
+                float moveSign = Mathf.Sign(hVel.x);   // Sağa gidiyorsa 1f, sola gidiyorsa -1f
+
+                // Karşıt yönlerdeyse geriye yürüyordur, hızı negatif yap
+                if (facingSign * moveSign < 0f)
+                {
+                    speedVal = -speedVal;
+                }
+            }
+
+            _animator.SetFloat(AnimParam.Speed, speedVal);
         }
 
         private void UpdateAnimatorSideLayer()

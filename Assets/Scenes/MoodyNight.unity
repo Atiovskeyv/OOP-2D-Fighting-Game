@@ -719,6 +719,7 @@ GameObject:
   - component: {fileID: 347672096}
   - component: {fileID: 347672095}
   - component: {fileID: 347672097}
+  - component: {fileID: 347672098}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -844,6 +845,29 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &347672098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 347672091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4244ed4be803b9244a6acf02a1bc3581, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FightingGame.Core.CameraFollow
+  player1: {fileID: 0}
+  player2: {fileID: 0}
+  smoothTime: 0.15
+  offset: {x: 0, y: 2.5, z: -12}
+  minDistanceZ: 8
+  maxDistanceZ: 20
+  zoomMultiplier: 1
+  minX: -15
+  maxX: 15
+  minY: 0.5
+  maxY: 8
 --- !u!4 &350120176 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6034798791324949902, guid: 953646203ab111b499c6f9a038ebc56e, type: 3}
