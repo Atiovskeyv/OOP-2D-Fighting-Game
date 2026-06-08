@@ -69,12 +69,10 @@ namespace FightingGame.Player
 
         /// <summary>
         /// Rakibin transform'unu set eder. MatchManager tarafından çağrılır.
-        /// AbstractCharacter'ın SetOpponent'ını proxy eder.
         /// </summary>
         public void SetOpponent(Transform opponentTransform)
         {
-            if (_character is AbstractCharacter ac)
-                ac.SetOpponent(opponentTransform);
+            _character.SetOpponent(opponentTransform);
         }
 
         // ══════════════════════════════════════════════════════════
@@ -88,12 +86,15 @@ namespace FightingGame.Player
 
             HandleWalk();
             HandleJump();
-            HandleAttack();
-            HandleBlock();
-            HandleCrouch();
-            HandleDash();
-            HandleSkill1();
-            HandleSkill2();
+            HandleSkill3(); // Ulti öncelikli taranır (Q+E)
+            HandleSkill1(); // Breaker (Q)
+            HandleSkill2(); // Enhanced (E)
+            HandlePunch();  // J
+            HandleKick();   // K
+            HandleShoot();  // U
+            HandleBlock();  // L (Sürekli)
+            HandleCrouch(); // S (Sürekli)
+            HandleDash();   // Shift / Numpad 0
         }
 
         private void OnDisable()
@@ -124,10 +125,22 @@ namespace FightingGame.Player
                 _character.Jump();
         }
 
-        private void HandleAttack()
+        private void HandlePunch()
         {
-            if (_input.GetAttack())
-                _character.Attack();
+            if (_input.GetPunch())
+                _character.Punch();
+        }
+
+        private void HandleKick()
+        {
+            if (_input.GetKick())
+                _character.Kick();
+        }
+
+        private void HandleShoot()
+        {
+            if (_input.GetShoot())
+                _character.Shoot();
         }
 
         private void HandleBlock()
@@ -152,13 +165,19 @@ namespace FightingGame.Player
         private void HandleSkill1()
         {
             if (_input.GetSkill1())
-                _character.Skill1();
+                _character.ExecuteSkill1();
         }
 
         private void HandleSkill2()
         {
             if (_input.GetSkill2())
-                _character.Skill2();
+                _character.ExecuteSkill2();
+        }
+
+        private void HandleSkill3()
+        {
+            if (_input.GetSkill3())
+                _character.ExecuteSkill3();
         }
     }
 }

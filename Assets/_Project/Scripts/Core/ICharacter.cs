@@ -21,6 +21,7 @@
 //
 // ============================================================
 
+using UnityEngine;
 using FightingGame.Core.Data;
 
 namespace FightingGame.Core.Interfaces
@@ -40,53 +41,66 @@ namespace FightingGame.Core.Interfaces
         /// <summary>
         /// Karakteri yatay eksende hareket ettirir.
         /// </summary>
-        /// <param name="direction">
-        /// -1f (sol) ile +1f (sağ) arasında yatay hareket değeri.
-        /// </param>
         void Walk(float direction);
 
         /// <summary>
-        /// Karakteri zıplatır. Yerdeyken çağrılmalıdır.
+        /// Karakteri zıplatır.
         /// </summary>
         void Jump();
 
         /// <summary>
-        /// Temel saldırıyı tetikler. Hitbox kontrolü ve
-        /// animator trigger'ı bu metodun içinde yönetilir.
+        /// Yumruk (Punch) saldırısını tetikler.
         /// </summary>
-        void Attack();
+        void Punch();
+
+        /// <summary>
+        /// Tekme (Kick) saldırısını tetikler.
+        /// </summary>
+        void Kick();
+
+        /// <summary>
+        /// Ateş (Shoot) saldırısını tetikler.
+        /// </summary>
+        void Shoot();
 
         /// <summary>
         /// Blok durumunu açar/kapatır.
         /// </summary>
-        /// <param name="active">true = blok başla, false = blok bırak</param>
         void Block(bool active);
 
         /// <summary>
         /// Çömelme durumunu açar/kapatır.
         /// </summary>
-        /// <param name="active">true = çömel, false = kalk</param>
         void Crouch(bool active);
 
         /// <summary>
         /// Belirtilen yöne dash yapar.
         /// </summary>
-        /// <param name="direction">
-        /// Dash yönü. 0 ise karakterin baktığı yöne dash yapılır.
-        /// </param>
         void Dash(float direction);
 
-        // ── Karaktere Özel Yetenekler ───────────────────────────
+        // ── Özel Yetenekler (Bar Harcayan) ──────────────────────
 
         /// <summary>
-        /// Q Skill — Her karakterin kendine özgü birinci yeteneği.
+        /// Özel Yetenek 1 (Enhanced Shoot) - 1 Bar harcar.
         /// </summary>
-        void Skill1();
+        void ExecuteSkill1();
 
         /// <summary>
-        /// Ultimate — Her karakterin kendine özgü ikinci (ulti) yeteneği.
+        /// Özel Yetenek 2 (Combo Breaker) - 2 Bar harcar.
         /// </summary>
-        void Skill2();
+        void ExecuteSkill2();
+
+        /// <summary>
+        /// Özel Yetenek 3 (Ultimate/X-Ray) - 3 Bar harcar.
+        /// </summary>
+        void ExecuteSkill3();
+
+        // ── Rakip Yönetimi ──────────────────────────────────────
+
+        /// <summary>
+        /// Rakibin transform referansını set eder.
+        /// </summary>
+        void SetOpponent(Transform opponentTransform);
 
         // ── Veri Erişimi ────────────────────────────────────────
 
@@ -99,6 +113,16 @@ namespace FightingGame.Core.Interfaces
         /// Karakterin mevcut can puanı.
         /// </summary>
         int CurrentHealth { get; }
+
+        /// <summary>
+        /// Karakterin mevcut Özel Bar (Special Meter) değeri. 0 - 300.
+        /// </summary>
+        float SpecialMeter { get; }
+
+        /// <summary>
+        /// Özel Bar kademe sayısı. 0 - 3.
+        /// </summary>
+        int SpecialMeterSegments { get; }
 
         /// <summary>
         /// Karakter hayatta mı?
