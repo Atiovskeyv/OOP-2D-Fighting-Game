@@ -4956,7 +4956,7 @@ MonoBehaviour:
   player2Character: -1
   characterPrefabs:
   - {fileID: 1506455538730125473, guid: d90d06e1ab4006c4a9a4447bf6142147, type: 3}
-  - {fileID: 1978302818448013366, guid: d60333e0edfb3874f83683472832dcbf, type: 3}
+  - {fileID: 5753212705130265844, guid: 4ec3c0fdcff914240b124e5783dba9ac, type: 3}
   - {fileID: 8760936306468678333, guid: 50da4025ae2dff141a74bb59a1fba2da, type: 3}
   - {fileID: 2831173280362714462, guid: ae970fa4faa3f3e4fb3961d8f3cc26e3, type: 3}
 --- !u!4 &1449208246
