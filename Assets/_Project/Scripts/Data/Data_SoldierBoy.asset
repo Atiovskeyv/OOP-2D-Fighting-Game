@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FightingGame.Core.Data.CharacterData
   characterName: Soldier Boy
   maxHealth: 500
-  moveSpeed: 5
-  jumpForce: 10
+  moveSpeed: 3
+  jumpForce: 8
   attackPower: 20
   attackCooldown: 0.5
   attackRange: 1.5

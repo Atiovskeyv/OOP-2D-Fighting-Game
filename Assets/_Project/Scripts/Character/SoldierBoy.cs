@@ -55,6 +55,13 @@ namespace FightingGame.Character
         [Tooltip("Göğüs Patlaması: Hasar çarpanı.")]
         [SerializeField] private float chestBlastDamageMultiplier = 8f;
 
+        [Header("Soldier Boy — Combo Forces")]
+        [Tooltip("PPP Kombosunda rakibin ne kadar havaya/geriye uçacağı (X: İleri/Geri, Y: Yukarı)")]
+        [SerializeField] private Vector3 pppLaunchForce = new Vector3(3f, 8f, 0f);
+
+        [Tooltip("PPK Kombosunda rakibin ne kadar havaya/geriye uçacağı")]
+        [SerializeField] private Vector3 ppkLaunchForce = new Vector3(3f, 9f, 0f);
+
         // Seri ateş sırasında hareket engeli
         private bool _isRapidFiring;
 
@@ -74,7 +81,7 @@ namespace FightingGame.Character
                 damageMultiplier = 2.5f,
                 isLauncher = true,
                 animTrigger = "PPP_Combo",
-                launchForce = new Vector3(3f, 12f, 0f)
+                launchForce = pppLaunchForce
             });
 
             // P + P + K (Launcher — İki yumruk + tekme, havaya fırlatma)
@@ -85,7 +92,7 @@ namespace FightingGame.Character
                 damageMultiplier = 3.0f,
                 isLauncher = true,
                 animTrigger = "PPK_Combo",
-                launchForce = new Vector3(3f, 13f, 0f)
+                launchForce = ppkLaunchForce
             });
 
             // P + P + S (İki yumruk + güçlü ateş — Uzaktan)
