@@ -81,6 +81,16 @@ namespace FightingGame.Character
         [Header("Attack Sync")]
         [SerializeField] private bool useAnimationEventSync = true;
 
+        [Header("Default Combo Forces")]
+        [Tooltip("Karakterlerin varsayılan PPP Kombosunda rakibin ne kadar havaya/geriye uçacağı (X: Geri, Y: Yukarı)")]
+        [SerializeField] protected Vector3 defaultPppLaunchForce = new Vector3(3f, 8f, 0f);
+
+        [Tooltip("Karakterlerin varsayılan PPK Kombosunda rakibin ne kadar havaya/geriye uçacağı")]
+        [SerializeField] protected Vector3 defaultPpkLaunchForce = new Vector3(3f, 9f, 0f);
+
+        [Tooltip("Karakter yere düştükten sonra ayağa kalkarken ne kadar süre (saniye) hareketsiz kalacağı")]
+        [SerializeField] protected float getUpStunDuration = 1.2f;
+
         [Header("Visual Settings")]
         [SerializeField] protected Transform visualMesh;
         [Tooltip("Animator geçişlerindeki (Idle/Walk vb.) yumuşatma hızı. (Büyük değer = Daha hızlı ve keskin geçiş)")]
@@ -178,14 +188,12 @@ namespace FightingGame.Character
 
         // Juggle / Havaya Fırlatma Fiziği Durumu
         private bool _isJuggled;
+        private bool _isKnockedDown;
         private float _juggleGravityMultiplier = 0.3f; // Havada süzülmesi için yerçekimi çarpanı
 
         private FightingCombo _currentCombo;
 
 
-        // ══════════════════════════════════════════════════════════
-        //  Unity Lifecycle
-        // ══════════════════════════════════════════════════════════
         protected virtual void Awake()
         {
             _cc       = GetComponent<CharacterController>();
@@ -332,7 +340,7 @@ namespace FightingGame.Character
                 Debug.Log($"<color=#00FFFF>🔥 [{gameObject.name}] Kombo Başladı: {combo.name} ({combo.damageMultiplier}x Hasar)</color>");
             }
 
-            TransitionTo(CharacterState.Attack);
+            AddState(CharacterState.Attack);
 
             SetAnimatorTrigger(combo.animTrigger);
 
@@ -411,7 +419,7 @@ namespace FightingGame.Character
                 damageMultiplier = 2.5f,
                 isLauncher = true,
                 animTrigger = "PPP_Combo",
-                launchForce = new Vector3(3f, 12f, 0f)
+                launchForce = defaultPppLaunchForce
             });
 
             // P + P + K (Launcher 2)
@@ -422,7 +430,7 @@ namespace FightingGame.Character
                 damageMultiplier = 3.0f,
                 isLauncher = true,
                 animTrigger = "PPK_Combo",
-                launchForce = new Vector3(3f, 13f, 0f)
+                launchForce = defaultPpkLaunchForce
             });
 
             // P + P + S (Heavy Shoot Combo)
@@ -597,8 +605,8 @@ namespace FightingGame.Character
                 return;
             }
 
+            _isKnockedDown = false; // Yeni darbede sersemliği sıfırla
             _hitStunTimer = data.hitStunDuration;
-            TransitionTo(CharacterState.Hit);
 
             if (launch)
             {
@@ -608,8 +616,23 @@ namespace FightingGame.Character
             else
             {
                 float pushDirection = -GetFacingSign();
-                _velocity = new Vector3(pushDirection * 2f, 0f, 0f);
+                
+                if (!_isGrounded)
+                {
+                    // Havada normal hasar yenirse mevcut düşüş hızını yarıya indirerek o anlık yavaşlama sağla
+                    _isJuggled = true;
+                    _velocity = new Vector3(pushDirection * 2f, _velocity.y * 0.5f, 0f);
+                }
+                else
+                {
+                    // Yerde normal hasar
+                    _velocity = new Vector3(pushDirection * 2f, 0f, 0f);
+                }
             }
+
+            // SyncAnimator'ın _isJuggled değerini doğru okuyabilmesi için TransitionTo'yu değişkenler güncellendikten SONRA çağırıyoruz.
+            // "force: true" veriyoruz çünkü karakter zaten Hit durumundaysa (kombo yiyorsa) metodun es geçmesini istemiyoruz!
+            TransitionTo(CharacterState.Hit, force: true);
         }
 
         // ══════════════════════════════════════════════════════════
@@ -620,13 +643,36 @@ namespace FightingGame.Character
         // ══════════════════════════════════════════════════════════
         //  Durum Makinesi
         // ══════════════════════════════════════════════════════════
-        protected void TransitionTo(CharacterState newState)
+        protected void TransitionTo(CharacterState newState, bool force = false)
         {
-            if (CurrentState == newState) return;
+            if (CurrentState == newState && !force) return;
             CharacterState previous = CurrentState;
             CurrentState = newState;
             SyncAnimator(previous, newState);
             OnStateChanged(previous, newState);
+        }
+
+        protected void AddState(CharacterState flag)
+        {
+            if (HasState(flag)) return;
+            CharacterState previous = CurrentState;
+            CurrentState |= flag;
+            SyncAnimator(previous, CurrentState);
+            OnStateChanged(previous, CurrentState);
+        }
+
+        protected void RemoveState(CharacterState flag)
+        {
+            if (!HasState(flag)) return;
+            CharacterState previous = CurrentState;
+            CurrentState &= ~flag;
+            
+            // Eğer üzerindeki tüm state'ler silindiyse karakteri 'hiçlik' (None) yerine varsayılan olan Idle'a döndür.
+            if (CurrentState == CharacterState.None) 
+                CurrentState = CharacterState.Idle;
+                
+            SyncAnimator(previous, CurrentState);
+            OnStateChanged(previous, CurrentState);
         }
 
         protected bool HasState(CharacterState flag) => (CurrentState & flag) != 0;
@@ -646,12 +692,12 @@ namespace FightingGame.Character
             if (_hasIsHitParam)       _animator.SetBool(AnimParam.IsHit,       false);
             if (_hasIsDeadParam)      _animator.SetBool(AnimParam.IsDead,      false);
 
-            // Aktif state'e göre ilgili parametreyi aç
-            if      (_hasIsJumpingParam   && HasState(CharacterState.Jump))   _animator.SetBool(AnimParam.IsJumping,   true);
-            else if (_hasIsCrouchingParam && HasState(CharacterState.Crouch)) _animator.SetBool(AnimParam.IsCrouching, true);
-            else if (_hasIsBlockingParam  && HasState(CharacterState.Block))  _animator.SetBool(AnimParam.IsBlocking,  true);
-            else if (_hasIsHitParam       && HasState(CharacterState.Hit))    _animator.SetBool(AnimParam.IsHit,       true);
-            else if (_hasIsDeadParam      && HasState(CharacterState.Dead))   _animator.SetBool(AnimParam.IsDead,      true);
+            // Aktif state'e göre ilgili parametreyi aç (artık else if yok, aynı anda ikisi de açık olabilir)
+            if (_hasIsJumpingParam   && HasState(CharacterState.Jump))   _animator.SetBool(AnimParam.IsJumping,   true);
+            if (_hasIsCrouchingParam && HasState(CharacterState.Crouch)) _animator.SetBool(AnimParam.IsCrouching, true);
+            if (_hasIsBlockingParam  && HasState(CharacterState.Block))  _animator.SetBool(AnimParam.IsBlocking,  true);
+            if (_hasIsHitParam       && HasState(CharacterState.Hit) && !_isKnockedDown) _animator.SetBool(AnimParam.IsHit, true);
+            if (_hasIsDeadParam      && HasState(CharacterState.Dead))   _animator.SetBool(AnimParam.IsDead,      true);
 
             // Fırlatılma durumunu ilet
             if (_hasIsJuggledParam) _animator.SetBool(AnimParam.IsJuggled, _isJuggled);
@@ -708,6 +754,7 @@ namespace FightingGame.Character
 
             if (HasState(CharacterState.Hit) && _hitStunTimer <= 0f)
             {
+                _isKnockedDown = false; // Yerde yatma süresi bitti
                 if (!_isJuggled)
                 {
                     TransitionTo(_isGrounded ? CharacterState.Idle : CharacterState.Jump);
@@ -721,12 +768,23 @@ namespace FightingGame.Character
 
         private void CheckGround()
         {
+            bool wasGrounded = _isGrounded;
             Vector3 checkPosition = groundCheck != null ? groundCheck.position : (transform.position + _cc.center - new Vector3(0f, _cc.height * 0.5f, 0f));
             _isGrounded = Physics.CheckSphere(checkPosition, groundCheckRadius, groundLayer);
-            if (_isGrounded && _velocity.y < 0f)
+            if (_isGrounded && !wasGrounded)
             {
                 _velocity.y = -2f;
-                _isJuggled = false;
+                if (_isJuggled)
+                {
+                    _isJuggled = false;
+                    _isKnockedDown = true; // Yere serildiğini işaretle ki normal Hit animasyonuna girmesin
+                    _hitStunTimer = getUpStunDuration; // Kalkma animasyonu süresince kilitli kalmasını sağla
+                    SyncAnimator(CurrentState, CurrentState);
+                }
+            }
+            else if (_isGrounded && _velocity.y < 0f)
+            {
+                _velocity.y = -2f;
             }
         }
 
@@ -737,7 +795,9 @@ namespace FightingGame.Character
             // Apply horizontal deceleration in hit stun or air
             if (HasState(CharacterState.Hit | CharacterState.Jump))
             {
-                _velocity.x = Mathf.MoveTowards(_velocity.x, 0f, 15f * Time.deltaTime);
+                // Yerdeyken sertçe durması lazım (15f), ama havaya fırlatıldığında parabolik uçması için momentumunu korumalı (2f)
+                float deceleration = _isJuggled ? 2f : 15f;
+                _velocity.x = Mathf.MoveTowards(_velocity.x, 0f, deceleration * Time.deltaTime);
             }
 
             if (_isGrounded) return;
@@ -762,13 +822,15 @@ namespace FightingGame.Character
                 TransitionTo(CharacterState.Idle);
         }
 
+
+
         private void ProcessCrouch()
         {
             if (!_isGrounded) return;
             if (HasState(CharacterState.Dead | CharacterState.Dash)) return;
 
-            if (_pendingCrouch) TransitionTo(CharacterState.Crouch);
-            else if (HasState(CharacterState.Crouch)) TransitionTo(CharacterState.Idle);
+            if (_pendingCrouch) AddState(CharacterState.Crouch);
+            else RemoveState(CharacterState.Crouch);
 
             float targetH = HasState(CharacterState.Crouch) ? crouchHeight : standingHeight;
             float newH     = Mathf.Lerp(_cc.height, targetH, crouchLerpSpeed * Time.deltaTime);
@@ -779,8 +841,8 @@ namespace FightingGame.Character
         private void ProcessBlock()
         {
             if (HasState(CharacterState.Dead | CharacterState.Dash | CharacterState.Attack)) return;
-            if (_pendingBlock) TransitionTo(CharacterState.Block);
-            else if (HasState(CharacterState.Block)) TransitionTo(CharacterState.Idle);
+            if (_pendingBlock) AddState(CharacterState.Block);
+            else RemoveState(CharacterState.Block);
         }
 
         private void UpdateFacing()
@@ -796,7 +858,10 @@ namespace FightingGame.Character
                 faceRight ? _defaultYRotation : _defaultYRotation + 180f, 0f);
         }
 
-        private void ApplyMovement() => _cc.Move(_velocity * Time.deltaTime);
+        private void ApplyMovement()
+        {
+            _cc.Move(_velocity * Time.deltaTime);
+        }
 
         private float GetFacingSign()
         {

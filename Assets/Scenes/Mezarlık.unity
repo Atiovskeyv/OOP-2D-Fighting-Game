@@ -23753,6 +23753,9 @@ MonoBehaviour:
   crouchHeight: 1
   crouchLerpSpeed: 12
   useAnimationEventSync: 0
+  defaultPppLaunchForce: {x: 3.5, y: 9, z: 0}
+  defaultPpkLaunchForce: {x: 4, y: 8, z: 0}
+  getUpStunDuration: 1.2
   visualMesh: {fileID: 1600991438}
   locomotionBlendSpeed: 15
   _comboWindow: 0.5
@@ -24447,7 +24450,10 @@ MonoBehaviour:
   standingHeight: 2
   crouchHeight: 1
   crouchLerpSpeed: 12
-  useAnimationEventSync: 0
+  useAnimationEventSync: 1
+  defaultPppLaunchForce: {x: 7, y: 6, z: 0}
+  defaultPpkLaunchForce: {x: 7, y: 8, z: 0}
+  getUpStunDuration: 0.7
   visualMesh: {fileID: 2027063417}
   locomotionBlendSpeed: 15
   _comboWindow: 0.5
@@ -24459,6 +24465,8 @@ MonoBehaviour:
   rapidFireDamageMultiplier: 1.5
   grenadeDamageMultiplier: 4
   chestBlastDamageMultiplier: 8
+  pppLaunchForce: {x: 3, y: 8, z: 0}
+  ppkLaunchForce: {x: 3, y: 9, z: 0}
 --- !u!114 &889843961
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24504,8 +24512,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 889843959}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.6417606, z: -0, w: 0.7669051}
-  m_LocalPosition: {x: 2.9970486, y: 0.17, z: -22.005377}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 2.996326, y: 0.17000002, z: -22.00534}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -24514,7 +24522,7 @@ Transform:
   - {fileID: 1922058671}
   - {fileID: 2027063417}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 79.846, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!4 &889921354 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: ee310940381d5f3409a44456d948e8e3, type: 3}
@@ -27529,7 +27537,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.0318
+      value: 1.0917476
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
       propertyPath: m_LocalPosition.x
@@ -27537,7 +27545,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.176
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
       propertyPath: m_LocalPosition.z
