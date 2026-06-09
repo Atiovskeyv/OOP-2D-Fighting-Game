@@ -60,9 +60,26 @@ public static class HealthBarCreator
         so2.FindProperty("fillImage").objectReferenceValue = fill2;
         so2.ApplyModifiedProperties();
 
+        // Special Meter kurulumunu otomatik çağır
+        SetupSpecialMeterTool.SetupSpecialMeter();
+
         Selection.activeGameObject = hb1;
-        Debug.Log("[HealthBarCreator] HealthBarP1 ve HealthBarP2 oluşturuldu! " +
-                  "Frame'lerin Source Image'ına çerçeve PNG'nizi atayın.");
+        Debug.Log("[HealthBarCreator] HealthBarP1 ve HealthBarP2 (Aynalı) oluşturuldu! Frame.png otomatik atandı.");
+    }
+
+    private static Sprite GetOrFixSprite(string path)
+    {
+        TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
+        if (importer != null)
+        {
+            if (importer.textureType != TextureImporterType.Sprite)
+            {
+                importer.textureType = TextureImporterType.Sprite;
+                importer.spriteImportMode = SpriteImportMode.Single;
+                importer.SaveAndReimport();
+            }
+        }
+        return AssetDatabase.LoadAssetAtPath<Sprite>(path);
     }
 
     private static GameObject CreateSingleHealthBar(
@@ -87,11 +104,10 @@ public static class HealthBarCreator
         fillMask.AddComponent<RectMask2D>();
 
         RectTransform maskRT = fillMask.GetComponent<RectTransform>();
-        // Stretch-Stretch (parent'ı kapla) + padding
         maskRT.anchorMin = Vector2.zero;
         maskRT.anchorMax = Vector2.one;
         maskRT.offsetMin = new Vector2(15f, 5f);   // left, bottom padding
-        maskRT.offsetMax = new Vector2(-15f, -5f);  // right, top padding (negatif!)
+        maskRT.offsetMax = new Vector2(-15f, -5f);  // right, top padding
 
         // ── Fill (can dolgusu — Filled Image) ────────────────
         GameObject fill = new GameObject("Fill", typeof(RectTransform));
@@ -100,15 +116,10 @@ public static class HealthBarCreator
         Image fillImg = fill.AddComponent<Image>();
         fillImg.color = new Color(0.2f, 0.8f, 0.2f, 1f); // yeşil
 
-        // Filled type ayarla
-        fillImg.type         = Image.Type.Filled;
-        fillImg.fillMethod   = Image.FillMethod.Horizontal;
-        fillImg.fillOrigin   = fillOriginLeft ? 0 : 1; // 0=Left, 1=Right
-        fillImg.fillAmount   = 1f;
+        fillImg.type = Image.Type.Simple;
         fillImg.raycastTarget = false;
 
         RectTransform fillRT = fill.GetComponent<RectTransform>();
-        // Stretch-Stretch (mask'ı tamamen kapla)
         fillRT.anchorMin = Vector2.zero;
         fillRT.anchorMax = Vector2.one;
         fillRT.offsetMin = Vector2.zero;
@@ -120,17 +131,30 @@ public static class HealthBarCreator
 
         Image frameImg = frame.AddComponent<Image>();
         frameImg.raycastTarget = false;
-        // Source Image'ı Inspector'dan manuel atanacak (çerçeve PNG)
+        
+        // Frame'i otomatik olarak yükle ve ata
+        Sprite frameSprite = GetOrFixSprite("Assets/Bar/Frame.png");
+        if (frameSprite != null)
+        {
+            frameImg.sprite = frameSprite;
+            frameImg.preserveAspect = true;
+        }
 
         RectTransform frameRT = frame.GetComponent<RectTransform>();
-        // Stretch-Stretch (parent'ı tamamen kapla)
         frameRT.anchorMin = Vector2.zero;
         frameRT.anchorMax = Vector2.one;
         frameRT.offsetMin = Vector2.zero;
         frameRT.offsetMax = Vector2.zero;
 
-        // Frame'i en sona koy (render'da en üstte görünsün)
         frame.transform.SetAsLastSibling();
+
+        // ── P2 Aynalama (Mirrored) ───────────────────────────
+        if (!fillOriginLeft) // fillOriginLeft false ise bu P2 demektir
+        {
+            // Hem çerçeveyi hem de dolguyu X ekseninde ters çevir (aynala)
+            frame.transform.localScale = new Vector3(-1, 1, 1);
+            fillMask.transform.localScale = new Vector3(-1, 1, 1);
+        }
 
         return root;
     }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -6,32 +7,47 @@ public class ButtonAnimation : MonoBehaviour,
     IPointerExitHandler,
     IPointerClickHandler
 {
-    private Vector3 originalScale;
-
-    void Start()
-    {
-        originalScale = transform.localScale;
-    }
+    private Dictionary<Transform, Vector3> originalScales = new Dictionary<Transform, Vector3>();
+    private Transform currentTarget;
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        transform.localScale = originalScale * 1.1f;
+        if (eventData.pointerEnter == null) return;
+
+        Transform target = eventData.pointerEnter.transform;
+        
+        if (!originalScales.ContainsKey(target))
+        {
+            originalScales[target] = target.localScale;
+        }
+
+        target.localScale = originalScales[target] * 1.1f;
+        currentTarget = target;
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        transform.localScale = originalScale;
+        if (currentTarget != null && originalScales.ContainsKey(currentTarget))
+        {
+            currentTarget.localScale = originalScales[currentTarget];
+            currentTarget = null;
+        }
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        transform.localScale = originalScale * 0.9f;
-
-        Invoke("ResetScale", 0.1f);
+        if (currentTarget != null && originalScales.ContainsKey(currentTarget))
+        {
+            currentTarget.localScale = originalScales[currentTarget] * 0.9f;
+            Invoke("ResetScale", 0.1f);
+        }
     }
 
     void ResetScale()
     {
-        transform.localScale = originalScale;
+        if (currentTarget != null && originalScales.ContainsKey(currentTarget))
+        {
+            currentTarget.localScale = originalScales[currentTarget];
+        }
     }
 }

@@ -57,6 +57,14 @@ namespace FightingGame.Core
         private UnityEngine.Camera _cam;
         private float _orthoZoomVelocity;
 
+        public void SetBounds(float minX, float maxX, float minY, float maxY)
+        {
+            this.minX = minX;
+            this.maxX = maxX;
+            this.minY = minY;
+            this.maxY = maxY;
+        }
+
         private void Start()
         {
             _cam = GetComponent<UnityEngine.Camera>();

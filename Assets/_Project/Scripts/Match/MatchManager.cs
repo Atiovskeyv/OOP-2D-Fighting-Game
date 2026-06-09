@@ -117,10 +117,33 @@ namespace FightingGame.Match
             // Health bar'ları spawn edilen karakterlere bağla
             BindHealthBars(p1Obj, p2Obj);
 
+            // Kamera sınırlarını seçilen haritaya göre ayarla
+            SetCameraBoundsForMap(GameManager.instance.selectedMap);
+
             // Sayacı ve oyun sonu mantığını başlat
             SetupTimer(p1Obj, p2Obj);
 
             Debug.Log("[MatchManager] Maç başladı!");
+        }
+
+        private void SetCameraBoundsForMap(string mapName)
+        {
+            if (UnityEngine.Camera.main != null)
+            {
+                var camFollow = UnityEngine.Camera.main.GetComponent<FightingGame.Core.CameraFollow>();
+                if (camFollow != null)
+                {
+                    if (mapName == "Mezarlık")
+                    {
+                        camFollow.SetBounds(-15f, 15f, 0.5f, 8f);
+                    }
+                    else // MoodyNight (Büyülü Orman vb.)
+                    {
+                        // Karakterler X=50 civarında spawn olduğu için kameranın sınırlarını o bölgeye kaydır
+                        camFollow.SetBounds(30f, 70f, 0.5f, 10f);
+                    }
+                }
+            }
         }
 
         // ══════════════════════════════════════════════════════════
@@ -288,15 +311,17 @@ namespace FightingGame.Match
                 _timerRect.anchorMax = new Vector2(0.5f, 1f);
                 _timerRect.pivot = new Vector2(0.5f, 1f);
                 _timerRect.anchoredPosition = new Vector2(0f, -20f); // Üstten biraz boşluk
-                _timerRect.sizeDelta = new Vector2(800f, 150f); // Genişlik büyük olsun
+                _timerRect.sizeDelta = new Vector2(1200f, 150f); // Genişliği artırdık ki taşmasın
                 
                 _timerText = timerObj.AddComponent<TMPro.TextMeshProUGUI>();
                 _timerText.alignment = TMPro.TextAlignmentOptions.Center;
-                _timerText.fontSize = 64f;
+                _timerText.enableAutoSizing = true;
+                _timerText.fontSizeMin = 40f;
+                _timerText.fontSizeMax = 80f; // Sayaç için maksimum 80
                 _timerText.color = Color.white;
                 _timerText.fontStyle = TMPro.FontStyles.Bold;
-                _timerText.enableWordWrapping = false;
-                _timerText.overflowMode = TMPro.TextOverflowModes.Overflow;
+                _timerText.enableWordWrapping = true; // Taştığında alt satıra geçmesine izin ver
+                _timerText.overflowMode = TMPro.TextOverflowModes.Truncate;
                 
                 if (timerFont != null)
                 {
@@ -369,15 +394,16 @@ namespace FightingGame.Match
 
             if (_timerText != null)
             {
-                _timerText.fontSize = 100f; // Ortada çok daha büyük görünsün
+                _timerText.fontSizeMax = 120f; // Kazandı yazısı için maksimum boyutu artır
                 
                 if (_timerRect != null)
                 {
-                    // Yazıyı ekranın tam ortasına al
+                    // Yazıyı ekranın tam ortasına al ve alanını büyüt
                     _timerRect.anchorMin = new Vector2(0.5f, 0.5f);
                     _timerRect.anchorMax = new Vector2(0.5f, 0.5f);
                     _timerRect.pivot = new Vector2(0.5f, 0.5f);
                     _timerRect.anchoredPosition = Vector2.zero;
+                    _timerRect.sizeDelta = new Vector2(1600f, 300f); // Ekrana sığması için devasa bir alan
                 }
 
                 if (winner != null)
