@@ -44,6 +44,7 @@ namespace FightingGame.Character
         public static readonly int IsHit         = Animator.StringToHash("isHit");
         public static readonly int IsDead        = Animator.StringToHash("isDead");
         public static readonly int AttackTrigger = Animator.StringToHash("AttackTrigger");
+        public static readonly int IsRightSide   = Animator.StringToHash("isRightSide");
     }
 
     [RequireComponent(typeof(CharacterController))]
@@ -120,6 +121,7 @@ namespace FightingGame.Character
         private bool _hasIsHitParam;
         private bool _hasIsDeadParam;
         private bool _hasAttackTriggerParam;
+        private bool _hasIsRightSideParam;
 
         // ── Dövüş ve Kombo Sistemi ──────────────────────────────
         public enum AttackInputType { Punch, Kick, Shoot }
@@ -392,6 +394,7 @@ namespace FightingGame.Character
                 else if (param.nameHash == AnimParam.IsHit) _hasIsHitParam = true;
                 else if (param.nameHash == AnimParam.IsDead) _hasIsDeadParam = true;
                 else if (param.nameHash == AnimParam.AttackTrigger) _hasAttackTriggerParam = true;
+                else if (param.nameHash == AnimParam.IsRightSide) _hasIsRightSideParam = true;
             }
         }
 
@@ -635,14 +638,14 @@ namespace FightingGame.Character
             if (_animator == null || _animator.runtimeAnimatorController == null) return;
 
             // Önce tüm parametreleri sıfırla (sadece varsa)
-            if (_hasIsJumpingParam)   _animator.SetBool(AnimParam.IsJumping,   false);
+            if (_hasIsJumpingParam)   _animator.SetBool(AnimParam.IsJumping,   !_isGrounded);
             if (_hasIsCrouchingParam) _animator.SetBool(AnimParam.IsCrouching, false);
             if (_hasIsBlockingParam)  _animator.SetBool(AnimParam.IsBlocking,  false);
             if (_hasIsHitParam)       _animator.SetBool(AnimParam.IsHit,       false);
             if (_hasIsDeadParam)      _animator.SetBool(AnimParam.IsDead,      false);
 
             // Aktif state'e göre ilgili parametreyi aç
-            if      (_hasIsJumpingParam   && HasState(CharacterState.Jump))   _animator.SetBool(AnimParam.IsJumping,   true);
+            if      (_hasIsJumpingParam   && (HasState(CharacterState.Jump) || !_isGrounded))   _animator.SetBool(AnimParam.IsJumping,   true);
             else if (_hasIsCrouchingParam && HasState(CharacterState.Crouch)) _animator.SetBool(AnimParam.IsCrouching, true);
             else if (_hasIsBlockingParam  && HasState(CharacterState.Block))  _animator.SetBool(AnimParam.IsBlocking,  true);
             else if (_hasIsHitParam       && HasState(CharacterState.Hit))    _animator.SetBool(AnimParam.IsHit,       true);
@@ -654,14 +657,37 @@ namespace FightingGame.Character
             if (_animator == null || _animator.runtimeAnimatorController == null) return;
             if (!_hasSpeedParam) return;
             Vector3 hVel = new Vector3(_cc.velocity.x, 0, _cc.velocity.z);
-            _animator.SetFloat(AnimParam.Speed, hVel.magnitude);
+            float speedVal = hVel.magnitude;
+
+            if (speedVal > 0.05f)
+            {
+                float facingSign = GetFacingSign(); // Sağa bakıyorsa 1f, sola bakıyorsa -1f
+                float moveSign = Mathf.Sign(hVel.x);   // Sağa gidiyorsa 1f, sola gidiyorsa -1f
+
+                // Karşıt yönlerdeyse geriye yürüyordur, hızı negatif yap
+                if (facingSign * moveSign < 0f)
+                {
+                    speedVal = -speedVal;
+                }
+            }
+
+            _animator.SetFloat(AnimParam.Speed, speedVal);
         }
 
         private void UpdateAnimatorSideLayer()
         {
-            if (_animator == null || opponent == null || _rightSideLayerIndex == -1) return;
+            if (_animator == null || opponent == null) return;
             bool isLeftSide = transform.position.x < opponent.position.x;
-            _animator.SetLayerWeight(_rightSideLayerIndex, isLeftSide ? 0f : 1f);
+
+            if (_hasIsRightSideParam)
+            {
+                _animator.SetBool(AnimParam.IsRightSide, !isLeftSide);
+            }
+
+            if (_rightSideLayerIndex != -1)
+            {
+                _animator.SetLayerWeight(_rightSideLayerIndex, isLeftSide ? 0f : 1f);
+            }
         }
 
         // ══════════════════════════════════════════════════════════
@@ -713,8 +739,8 @@ namespace FightingGame.Character
         {
             if (HasState(CharacterState.Dash)) return;
 
-            // Apply horizontal deceleration in hit stun or air
-            if (HasState(CharacterState.Hit | CharacterState.Jump))
+            // Hasar durumunda (hit stun) yatay hızı yavaşlat, ancak zıplamada momentumu koru
+            if (HasState(CharacterState.Hit))
             {
                 _velocity.x = Mathf.MoveTowards(_velocity.x, 0f, 15f * Time.deltaTime);
             }
@@ -732,7 +758,12 @@ namespace FightingGame.Character
         private void ProcessMovement()
         {
             if (HasState(CharacterState.Dead | CharacterState.Hit | CharacterState.Dash)) return;
-            _velocity.x = _pendingHorizontal * data.moveSpeed;
+            
+            // Havadayken (jump vb.) yatay hareketi kilitle. Sadece yerdeyken girdi al.
+            if (_isGrounded)
+            {
+                _velocity.x = _pendingHorizontal * data.moveSpeed;
+            }
 
             if (_isGrounded && !HasState(CharacterState.Attack | CharacterState.Block | CharacterState.Crouch))
                 TransitionTo(Mathf.Abs(_pendingHorizontal) > 0.01f ? CharacterState.Move : CharacterState.Idle);
