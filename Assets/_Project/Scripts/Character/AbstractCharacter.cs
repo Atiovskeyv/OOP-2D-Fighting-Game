@@ -48,6 +48,7 @@ namespace FightingGame.Character
         // YENİ EKLENENLER:
         public static readonly int VerticalVelocity = Animator.StringToHash("VerticalVelocity");
         public static readonly int IsJuggled        = Animator.StringToHash("isJuggled");
+        public static readonly int IsRightSide      = Animator.StringToHash("isRightSide");
     }
 
     [RequireComponent(typeof(CharacterController))]
@@ -114,6 +115,7 @@ namespace FightingGame.Character
         // ── Bileşen Referansları ────────────────────────────────
         private CharacterController _cc;
         protected Animator          _animator;
+        private int                 _rightSideLayerIndex = -1;
 
         // ── Fizik ───────────────────────────────────────────────
         private Vector3 _velocity;
@@ -140,6 +142,7 @@ namespace FightingGame.Character
         private bool _hasAttackTriggerParam;
         private bool _hasVerticalVelocityParam;
         private bool _hasIsJuggledParam;
+        private bool _hasIsRightSideParam;
 
         // ── Dövüş ve Kombo Sistemi ──────────────────────────────
         public enum AttackInputType { Punch, Kick, Shoot }
@@ -212,6 +215,11 @@ namespace FightingGame.Character
 
             InitializeAnimatorParameters();
             InitializeCombos();
+
+            if (_animator != null)
+            {
+                _rightSideLayerIndex = _animator.GetLayerIndex("Right Side Layer");
+            }
         }
 
         protected virtual void Update()
@@ -227,6 +235,7 @@ namespace FightingGame.Character
             ProcessBlock();
             ApplyMovement();
             UpdateFacing();
+            UpdateAnimatorSideLayer();
             UpdateAnimatorLocomotion();
         }
 
@@ -406,6 +415,7 @@ namespace FightingGame.Character
                 else if (param.nameHash == AnimParam.AttackTrigger) _hasAttackTriggerParam = true;
                 else if (param.nameHash == AnimParam.VerticalVelocity) _hasVerticalVelocityParam = true;
                 else if (param.nameHash == AnimParam.IsJuggled) _hasIsJuggledParam = true;
+                else if (param.nameHash == AnimParam.IsRightSide) _hasIsRightSideParam = true;
             }
         }
 
@@ -639,6 +649,7 @@ namespace FightingGame.Character
         //  Rakip Yönetimi
         // ══════════════════════════════════════════════════════════
         public void SetOpponent(Transform opponentTransform) => opponent = opponentTransform;
+        public void SetEnemyLayer(LayerMask mask) => enemyLayer = mask;
 
         // ══════════════════════════════════════════════════════════
         //  Durum Makinesi
@@ -686,18 +697,18 @@ namespace FightingGame.Character
             if (_animator == null || _animator.runtimeAnimatorController == null) return;
 
             // Önce tüm parametreleri sıfırla (sadece varsa)
-            if (_hasIsJumpingParam)   _animator.SetBool(AnimParam.IsJumping,   false);
+            if (_hasIsJumpingParam)   _animator.SetBool(AnimParam.IsJumping,   !_isGrounded);
             if (_hasIsCrouchingParam) _animator.SetBool(AnimParam.IsCrouching, false);
             if (_hasIsBlockingParam)  _animator.SetBool(AnimParam.IsBlocking,  false);
             if (_hasIsHitParam)       _animator.SetBool(AnimParam.IsHit,       false);
             if (_hasIsDeadParam)      _animator.SetBool(AnimParam.IsDead,      false);
 
             // Aktif state'e göre ilgili parametreyi aç (artık else if yok, aynı anda ikisi de açık olabilir)
-            if (_hasIsJumpingParam   && HasState(CharacterState.Jump))   _animator.SetBool(AnimParam.IsJumping,   true);
-            if (_hasIsCrouchingParam && HasState(CharacterState.Crouch)) _animator.SetBool(AnimParam.IsCrouching, true);
-            if (_hasIsBlockingParam  && HasState(CharacterState.Block))  _animator.SetBool(AnimParam.IsBlocking,  true);
-            if (_hasIsHitParam       && HasState(CharacterState.Hit) && !_isKnockedDown) _animator.SetBool(AnimParam.IsHit, true);
-            if (_hasIsDeadParam      && HasState(CharacterState.Dead))   _animator.SetBool(AnimParam.IsDead,      true);
+            if (_hasIsJumpingParam   && (HasState(CharacterState.Jump) || !_isGrounded)) _animator.SetBool(AnimParam.IsJumping,   true);
+            if (_hasIsCrouchingParam && HasState(CharacterState.Crouch))                 _animator.SetBool(AnimParam.IsCrouching, true);
+            if (_hasIsBlockingParam  && HasState(CharacterState.Block))                  _animator.SetBool(AnimParam.IsBlocking,  true);
+            if (_hasIsHitParam       && HasState(CharacterState.Hit) && !_isKnockedDown) _animator.SetBool(AnimParam.IsHit,       true);
+            if (_hasIsDeadParam      && HasState(CharacterState.Dead))                   _animator.SetBool(AnimParam.IsDead,      true);
 
             // Fırlatılma durumunu ilet
             if (_hasIsJuggledParam) _animator.SetBool(AnimParam.IsJuggled, _isJuggled);
@@ -706,7 +717,6 @@ namespace FightingGame.Character
         private void UpdateAnimatorLocomotion()
         {
             if (_animator == null || _animator.runtimeAnimatorController == null) return;
-            
             if (_hasSpeedParam)
             {
                 Vector3 hVel = new Vector3(_cc.velocity.x, 0, _cc.velocity.z);
@@ -728,6 +738,22 @@ namespace FightingGame.Character
             {
                 // Y eksenindeki ivmeyi doğrudan Animatör'e ver (+ ise zıplıyor, - ise düşüyor)
                 _animator.SetFloat(AnimParam.VerticalVelocity, _cc.velocity.y);
+            }
+        }
+
+        private void UpdateAnimatorSideLayer()
+        {
+            if (_animator == null || opponent == null) return;
+            bool isLeftSide = transform.position.x < opponent.position.x;
+
+            if (_hasIsRightSideParam)
+            {
+                _animator.SetBool(AnimParam.IsRightSide, !isLeftSide);
+            }
+
+            if (_rightSideLayerIndex != -1)
+            {
+                _animator.SetLayerWeight(_rightSideLayerIndex, isLeftSide ? 0f : 1f);
             }
         }
 
@@ -792,8 +818,8 @@ namespace FightingGame.Character
         {
             if (HasState(CharacterState.Dash)) return;
 
-            // Apply horizontal deceleration in hit stun or air
-            if (HasState(CharacterState.Hit | CharacterState.Jump))
+            // Hasar durumunda (hit stun) yatay hızı yavaşlat, ancak zıplamada momentumu koru
+            if (HasState(CharacterState.Hit))
             {
                 // Yerdeyken sertçe durması lazım (15f), ama havaya fırlatıldığında parabolik uçması için momentumunu korumalı (2f)
                 float deceleration = _isJuggled ? 2f : 15f;
@@ -813,7 +839,12 @@ namespace FightingGame.Character
         private void ProcessMovement()
         {
             if (HasState(CharacterState.Dead | CharacterState.Hit | CharacterState.Dash)) return;
-            _velocity.x = _pendingHorizontal * data.moveSpeed;
+            
+            // Havadayken (jump vb.) yatay hareketi kilitle. Sadece yerdeyken girdi al.
+            if (_isGrounded)
+            {
+                _velocity.x = _pendingHorizontal * data.moveSpeed;
+            }
 
             if (_isGrounded && !HasState(CharacterState.Attack | CharacterState.Block | CharacterState.Crouch))
                 TransitionTo(Mathf.Abs(_pendingHorizontal) > 0.01f ? CharacterState.Move : CharacterState.Idle);

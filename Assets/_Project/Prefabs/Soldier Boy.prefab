@@ -1,0 +1,225 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7204625573592720000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4126067813642088217}
+  m_Layer: 0
+  m_Name: AttackPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4126067813642088217
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7204625573592720000}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.36, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9109508229758365475}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8344813358351676178
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5293109799292317313}
+  m_Layer: 0
+  m_Name: GroundCheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5293109799292317313
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8344813358351676178}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9109508229758365475}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &8782511880343374024
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.71078
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.00938
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.26622
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_Name
+      value: Soldier Boy
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 796e723a8b8efa54eb69d7e0c2e32197, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4126067813642088217}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5293109799292317313}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1771882695336678680}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3776772080945303132}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2669925833868338762}
+  m_SourcePrefab: {fileID: 100100000, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+--- !u!1 &8439932430152824217 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+  m_PrefabInstance: {fileID: 8782511880343374024}
+  m_PrefabAsset: {fileID: 0}
+--- !u!143 &1771882695336678680
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8439932430152824217}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3776772080945303132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8439932430152824217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1095b80bd39725468e8d309d59a2f5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FightingGame.Character.SoldierBoy
+  data: {fileID: 11400000, guid: 0632499d33bf05a4b83379db5d8bcacd, type: 2}
+  attackPoint: {fileID: 4126067813642088217}
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  shootPoint: {fileID: 0}
+  opponent: {fileID: 0}
+  groundCheck: {fileID: 5293109799292317313}
+  groundCheckRadius: 0.2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  standingHeight: 2
+  crouchHeight: 1
+  crouchLerpSpeed: 12
+  useAnimationEventSync: 1
+  visualMesh: {fileID: 0}
+  _comboWindow: 0.5
+  bulletPrefab: {fileID: 0}
+  grenadePrefab: {fileID: 0}
+  chestBlastPrefab: {fileID: 0}
+  rapidFireCount: 6
+  rapidFireInterval: 0.1
+  rapidFireDamageMultiplier: 1.5
+  grenadeDamageMultiplier: 4
+  chestBlastDamageMultiplier: 8
+--- !u!114 &2669925833868338762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8439932430152824217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87a3c85b3ed1ad6479e9a16ea87dde53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FightingGame.Player.Player
+--- !u!4 &9109508229758365475 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8e7c1e3b0f351e34ab765f30e0ca6495, type: 3}
+  m_PrefabInstance: {fileID: 8782511880343374024}
+  m_PrefabAsset: {fileID: 0}
