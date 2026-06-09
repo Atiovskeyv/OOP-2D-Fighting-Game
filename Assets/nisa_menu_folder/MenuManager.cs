@@ -9,10 +9,6 @@ public class MenuManager : MonoBehaviour
     public GameObject characterPanel;
     public GameObject settingsPanel;
 
-    [Header("Character Selection Panels")]
-    public GameObject character1Panel;
-    public GameObject character2Panel;
-
     private bool player1Selected = false;
     private bool player2Selected = false;
 
@@ -89,9 +85,6 @@ public class MenuManager : MonoBehaviour
 
         characterPanel.SetActive(true);
 
-        character1Panel.SetActive(true);
-        character2Panel.SetActive(true);
-
         player1Selected = false;
         player2Selected = false;
 
@@ -103,29 +96,34 @@ public class MenuManager : MonoBehaviour
     // CHARACTER SELECTION
     // =========================
 
-    // PLAYER 1
+
+    // PLAYER 1 CHARACTER
+
     public void SelectCharacterP1(int id)
     {
         GameManager.instance.player1Character = id;
 
         player1Selected = true;
 
-        Debug.Log("P1 seçti: " + id);
+        Debug.Log("P1 seçti: " + GetCharacterName(id));
 
         CheckBothPlayersReady();
     }
 
-    // PLAYER 2
+    // PLAYER 2 CHARACTER
+
     public void SelectCharacterP2(int id)
     {
         GameManager.instance.player2Character = id;
 
         player2Selected = true;
 
-        Debug.Log("P2 seçti: " + id);
+        Debug.Log("P2 seçti: " + GetCharacterName(id));
 
         CheckBothPlayersReady();
     }
+
+    // CHECK READY
 
     void CheckBothPlayersReady()
     {
@@ -135,6 +133,8 @@ public class MenuManager : MonoBehaviour
         }
     }
 
+    // START MATCH
+
     public void StartMatch()
     {
         if (!player1Selected || !player2Selected)
@@ -143,7 +143,37 @@ public class MenuManager : MonoBehaviour
             return;
         }
 
+        Debug.Log("Maç Başlıyor!");
+
+        Debug.Log("P1: " + GetCharacterName(GameManager.instance.player1Character));
+        Debug.Log("P2: " + GetCharacterName(GameManager.instance.player2Character));
+
         SceneManager.LoadScene(GameManager.instance.selectedMap);
+    }
+
+    // =========================
+    // CHARACTER NAME SYSTEM
+    // =========================
+
+    string GetCharacterName(int id)
+    {
+        switch (id)
+        {
+            case 0:
+                return "Omni-man";
+
+            case 1:
+                return "Soldier Boy";
+
+            case 2:
+                return "Alber Wesker";
+
+            case 3:
+                return "Lara Croft";
+
+            default:
+                return "Unknown";
+        }
     }
 
     // =========================
@@ -158,6 +188,7 @@ public class MenuManager : MonoBehaviour
     public void BackToMenu()
     {
         CloseAllPanels();
+
         mainMenuPanel.SetActive(true);
     }
 }

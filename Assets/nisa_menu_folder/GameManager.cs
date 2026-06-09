@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
     public int player2Character = -1;
 
     [Header("Character Prefabs")]
-    [Tooltip("Sırasıyla: [0]=Wesker, [1]=Omniman, [2]=LaraCroft, [3]=SoldierBoy")]
+    [Tooltip("Sırasıyla: [0]=Omniman, [1]=SoldierBoy, [2]=Wesker, [3]=LaraCroft")]
     public GameObject[] characterPrefabs;
 
     private void Awake()
